@@ -12,7 +12,6 @@ from flask import Flask
 
 from main.apis.v0_1 import api_v0_1
 from main.blueprints.main import main_bp
-from main.plugins.extensions import login_manager
 from main.settings import config
 
 
