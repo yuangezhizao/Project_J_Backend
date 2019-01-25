@@ -12,6 +12,7 @@ from flask import Flask
 
 from main.apis.v0_1 import api_v0_1
 from main.blueprints.main import main_bp
+from main.plugins.extensions import db
 from main.settings import config
 
 
@@ -32,7 +33,7 @@ def create_app(config_name=None):
 
 
 def register_extensions(app):
-    pass
+    db.init_app(app)
 
 
 def register_blueprints(app):
