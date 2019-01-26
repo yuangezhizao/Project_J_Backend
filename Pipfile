@@ -10,6 +10,7 @@ name = "pypi"
 flask = "*"
 flask-cors = "*"
 flask-mongoengine = "*"
+python-dotenv = "*"
 
 
 [dev-packages]
