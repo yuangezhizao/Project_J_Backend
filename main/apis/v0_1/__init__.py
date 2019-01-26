@@ -12,3 +12,6 @@ from flask_cors import CORS
 api_v0_1 = Blueprint('api_v0_1', __name__)
 
 CORS(api_v0_1)
+
+from . import auth, outputs
+# https://blog.csdn.net/hjxzb/article/details/78910832
