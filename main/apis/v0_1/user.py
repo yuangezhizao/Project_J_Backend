@@ -87,7 +87,7 @@ def user_login():
 
     data = user.code2Session(wxcode)
     if isinstance(data, list):
-        openid, session_key, unionid = data
+        openid, session_key = data
     else:
         return data
     query = WX_User.objects(openid=openid)
@@ -119,3 +119,9 @@ def user_set_invitees():
         return bad_request('参数错误')
     r = g.user.set_invitees(invitation_code)
     return r
+
+
+@api_v0_1.route('/user/invitation_code')
+@auth_required
+def user_invitation_code():
+    return success(g.user.invitation_code)

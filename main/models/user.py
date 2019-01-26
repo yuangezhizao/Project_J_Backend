@@ -12,18 +12,13 @@ import requests
 from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature
 from itsdangerous import URLSafeSerializer
-# from mongoengine import connect
 
 from main.apis.v0_1.outputs import unauthorized, success, forbidden
 from main.plugins.extensions import db
 
 
-# connect(db='jd', alias='jd')
-
-
 class WX_User(db.Document):
     meta = {
-        # 'db_alias': 'jd',
         'collection': 'projectj_wx_users'
     }
     uid = db.IntField(required=True, unique=True)  # 自增 uid
