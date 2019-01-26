@@ -8,32 +8,83 @@
 """
 import datetime
 
+import requests
+from flask import current_app
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature
+from itsdangerous import URLSafeSerializer
+# from mongoengine import connect
+
+from main.apis.v0_1.outputs import unauthorized, success, forbidden
 from main.plugins.extensions import db
 
 
-class WX_Users(db.Document):
+# connect(db='jd', alias='jd')
+
+
+class WX_User(db.Document):
     meta = {
-        "collection": "wx_users"
+        # 'db_alias': 'jd',
+        'collection': 'projectj_wx_users'
     }
-    uid = db.IntField(required=True)  # 自增 uid
-    openid = db.StringField(required=True)  # 用户唯一标识（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
+    uid = db.IntField(required=True, unique=True)  # 自增 uid
+    openid = db.StringField(unique=True)  # 用户唯一标识（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
     # unionid  # 用户在开放平台的唯一标识符，在满足 UnionID 下发条件的情况下会返回，详见 UnionID 机制说明。（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
-    session_key = db.StringField(required=True)  # 会话密钥（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
+    session_key = db.StringField(default=None)  # 会话密钥（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
 
-    userinfo = db.StringField(required=True)  # 用户信息对象，不包含 openid 等敏感信息（前端传入）
+    userinfo = db.DictField(default=None)  # 用户信息对象，不包含 openid 等敏感信息（前端传入）
 
-    token = db.StringField(required=True)  # 开发者服务器自定义登录态
+    token = db.StringField(default=None)  # 开发者服务器自定义登录态
     member_since = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户登录时间（填写完邀请码之后才算注册）
     # last_seen = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户上次活跃，考虑到后期的负载还是禁用吧
 
-    # phonenumber = db.StringField()  # 用户绑定的手机号（国外手机号会有区号）
-    # purePhoneNumber = db.StringField()  # 没有区号的手机号
-    # countryCode = db.StringField()  # 区号
+    # phonenumber = db.StringField(default=None)  # 用户绑定的手机号（国外手机号会有区号）
+    # purePhoneNumber = db.StringField(default=None)  # 没有区号的手机号
+    # countryCode = db.StringField(default=None)  # 区号
     # 微信官方获取手机号接口，暂不使用
 
-    invitation_code = db.StringField()
-    # 邀请码供他人使用，详细说明见具体路由处
-    invitees = db.IntField()
+    invitation_code = db.StringField(default=None)
+    # 邀请码供他人使用，详细说明见初始化
+    invitees = db.IntField(default=None)
     # 被邀请人，别人的 uid
     points = db.IntField(default=0)
-    # 此处积分为零，详细说明见具体路由处
+
+    # 此处积分为零，详细说明见下方
+
+    def code2Session(self, wxcode):
+        url = 'https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code'.format(
+            current_app.config['appid'], current_app.config['secret'], wxcode)
+        r = requests.get(url).json()
+        if not r['errcode']:
+            openid = r['openid']
+            session_key = r['session_key']
+            # unionid = r['unionid']
+            return [openid, session_key]
+        else:
+            return forbidden(r['errmsg'])
+
+    def init_invitation_code(self):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        self.invitation_code = s.dumps(self.uid)
+        # 邀请码为 URL安全序列化（SECRET_KEY 参与计算）的结果，因此上次提交注销之前的 SECRET_KEY
+
+    def generate_token(self):
+        expiration = 3600
+        # 令牌过期时间暂定为一小时
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        token = s.dumps({'uid': self.uid})
+        self.token = token.decode('ascii')
+        self.save()
+        return {'token': self.token, 'expires_in': expiration}
+
+    def set_invitees(self, invitation_code):
+        if self.invitees:
+            return forbidden('你已填过邀请码')
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        try:
+            invitees = s.loads(invitation_code)
+        except BadSignature:
+            return unauthorized('邀请码无效')
+        self.invitees = invitees
+        self.points = 1000
+        self.save()
+        return success('1000 积分已到账')

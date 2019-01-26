@@ -11,16 +11,9 @@ from functools import wraps
 from flask import g, current_app, request
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
-from main.apis.v0_1.outputs import unauthorized
-from main.models.user import WX_Users
-
-
-def generate_token(user):
-    expiration = 3600
-    # 令牌过期时间暂定为一小时
-    s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
-    token = s.dumps({'uid': user.uid}).decode('ascii')
-    return token, expiration
+from main.apis.v0_1 import api_v0_1
+from main.apis.v0_1.outputs import unauthorized, success, bad_request
+from main.models.user import WX_User
 
 
 def validate_token(token):
@@ -32,8 +25,8 @@ def validate_token(token):
     except BadSignature:
         return unauthorized('BadSignature')  # invalid token
     # 以下来自 def _get_openid_token(token):
-    query = WX_Users.objects(uid=data['uid'])[0]
-    g.current_user = query  # 用户信息放到 g 中以便使用
+    query = WX_User.objects(uid=data['uid'])[0]
+    g.user = query  # 用户信息放到 g 中以便使用
     return True
 
 
@@ -51,7 +44,7 @@ def get_token():
     #
     # return token_type, token
     # TODO：小程序不支持 cookies 操作，但 token 暂未放在 headers 中，
-    return request.form.get('token', None)
+    return request.args.get('token', None)
 
 
 def auth_required(f):
@@ -72,3 +65,57 @@ def auth_required(f):
         return f(*args, **kwargs)
 
     return decorated
+
+
+@api_v0_1.route('/user/login')
+def user_login():
+    try:
+        wxcode = request.form.get('wxcode')
+        userinfo = request.form.get('userinfo')
+        rawData = request.form.get('rawData')
+        signature = request.form.get('signature')
+        iv = request.form.get('iv')
+        print('rawData：' + rawData)
+        print('signature：' + signature)
+        print('iv：' + iv)
+        # TODO：开放数据校验与解密（防止伪造）
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+
+    user = WX_User()
+
+    data = user.code2Session(wxcode)
+    if isinstance(data, list):
+        openid, session_key, unionid = data
+    else:
+        return data
+    query = WX_User.objects(openid=openid)
+    # 已注册用户处理：在此之前不要保存用户
+    if query:
+        query.update_one(set__session_key=session_key,
+                         # set__unionid=unionid,
+                         set__userinfo=userinfo
+                         )
+    else:
+        user.uid = WX_User.objects.all().count() + 1
+        user.openid = openid
+        user.session_key = session_key
+        # user.unionid = unionid
+        user.userinfo = userinfo
+        user.save()
+        user.init_invitation_code()
+    token = user.generate_token()
+    return success(token)
+
+
+@api_v0_1.route('/user/set_invitees', methods=['POST'])
+@auth_required
+def user_set_invitees():
+    try:
+        invitation_code = request.form.get('invitation_code')
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    r = g.user.set_invitees(invitation_code)
+    return r
