@@ -46,7 +46,7 @@ class WX_User(db.Document):
 
     def code2Session(self, wxcode):
         url = 'https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code'.format(
-            current_app.config['appid'], current_app.config['secret'], wxcode)
+            current_app.config['APPID'], current_app.config['APPSECRET'], wxcode)
         r = requests.get(url).json()
         if not r['errcode']:
             openid = r['openid']

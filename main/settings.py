@@ -14,6 +14,8 @@ basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY', None)
     MONGODB_SETTINGS = os.getenv('MONGODB_SETTINGS', None)
+    APPID = os.getenv('APPID', None)
+    APPSECRET = os.getenv('APPSECRET', None)
 
 
 class DevelopmentConfig(BaseConfig):
