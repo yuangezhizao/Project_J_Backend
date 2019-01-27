@@ -29,7 +29,7 @@ class WX_User(db.Document):
 
     token = db.StringField(default=None)  # 开发者服务器自定义登录态
     member_since = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户登录时间（填写完邀请码之后才算注册）
-    # last_seen = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户上次活跃，考虑到后期的负载还是禁用吧
+    last_seen = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户刷新 token 时间
 
     # phonenumber = db.StringField(default=None)  # 用户绑定的手机号（国外手机号会有区号）
     # purePhoneNumber = db.StringField(default=None)  # 没有区号的手机号
@@ -73,7 +73,13 @@ class WX_User(db.Document):
         token = s.dumps({'uid': self.uid})
         self.token = token.decode('ascii')
         self.save()
+        self.ping()
         return {'token': self.token, 'expires_in': expiration}
+
+    def ping(self):
+        now_time = datetime.datetime.utcnow
+        self.last_seen = now_time
+        self.save()
 
     '''
     from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature
