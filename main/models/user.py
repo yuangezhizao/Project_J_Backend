@@ -91,9 +91,10 @@ class WX_User(db.Document):
         return success('1000 积分已到账')
     '''
 
-    def set_invitees(self, uid):
+    def set_invitees(self, invitation_code):
         if self.invitees:
             return forbidden('你已填过邀请码')
+        uid = invitation_code - current_app.config['FAKE_NUM']
         query = WX_User.objects(uid=uid)
         if not query:
             return unauthorized('邀请码无效')

@@ -101,7 +101,7 @@ def user_login():
                          set__userinfo=userinfo
                          )
     else:
-        user.uid = WX_User.objects.all().count() + 1
+        user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
         user.openid = openid
         user.session_key = session_key
         # user.unionid = unionid

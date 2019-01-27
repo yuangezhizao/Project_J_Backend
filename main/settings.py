@@ -16,6 +16,7 @@ class BaseConfig:
     MONGODB_SETTINGS = os.getenv('MONGODB_SETTINGS', None)
     APPID = os.getenv('APPID', None)
     APPSECRET = os.getenv('APPSECRET', None)
+    FAKE_NUM = os.getenv('FAKE_NUM', None)
 
 
 class DevelopmentConfig(BaseConfig):
