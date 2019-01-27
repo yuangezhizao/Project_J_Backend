@@ -48,10 +48,11 @@ class WX_User(db.Document):
         url = 'https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code'.format(
             current_app.config['APPID'], current_app.config['APPSECRET'], wxcode)
         r = requests.get(url).json()
-        if not r['errcode']:
+        if not 'errmsg' in r:
             openid = r['openid']
             session_key = r['session_key']
             # unionid = r['unionid']
+            # 此处确认暂时没有返回 unionid
             return [openid, session_key]
         else:
             return forbidden(r['errmsg'])
