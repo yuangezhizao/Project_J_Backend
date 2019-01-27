@@ -98,14 +98,15 @@ def user_login():
     if query:
         query.update_one(set__session_key=session_key,
                          # set__unionid=unionid,
-                         set__userinfo=userinfo
+                         set__userinfo=eval(userinfo)
                          )
+        user = query[0]
     else:
         user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
         user.openid = openid
         user.session_key = session_key
         # user.unionid = unionid
-        user.userinfo = userinfo
+        user.userinfo = eval(userinfo)
         user.save()
         # user.init_invitation_code()
     token = user.generate_token()
