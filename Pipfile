@@ -12,6 +12,7 @@ flask-cors = "*"
 flask-mongoengine = "*"
 python-dotenv = "*"
 requests = "*"
+flask-script = "*"
 
 
 [dev-packages]
