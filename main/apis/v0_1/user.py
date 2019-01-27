@@ -21,9 +21,9 @@ def validate_token(token):
     try:
         data = s.loads(token)
     except SignatureExpired:
-        return unauthorized('SignatureExpired')  # valid token, but expired
+        return 'SignatureExpired'  # valid token, but expired
     except BadSignature:
-        return unauthorized('BadSignature')  # invalid token
+        return 'BadSignature'  # invalid token
     # 以下来自 def _get_openid_token(token):
     query = WX_User.objects(uid=data['uid'])[0]
     g.user = query  # 用户信息放到 g 中以便使用
@@ -59,9 +59,10 @@ def auth_required(f):
         if request.method != 'OPTIONS':
             if token is None:
                 return unauthorized('token_missing')
-            if not validate_token(token):
-                # 在 validate_token 中输出详细信息，故走不到下一行
-                return unauthorized('invalid_token')
+            result = validate_token(token)
+            if result != True:
+                # 切记此处不可改成 if not result
+                return unauthorized(result)
         return f(*args, **kwargs)
 
     return decorated
@@ -104,7 +105,7 @@ def user_login():
         # user.unionid = unionid
         user.userinfo = userinfo
         user.save()
-        user.init_invitation_code()
+        # user.init_invitation_code()
     token = user.generate_token()
     return success(token)
 
@@ -124,7 +125,7 @@ def user_set_invitees():
 @api_v0_1.route('/user/invitation_code')
 @auth_required
 def user_invitation_code():
-    return success(g.user.invitation_code)
+    return success(g.user.uid)
 
 
 @api_v0_1.route('/user/points')

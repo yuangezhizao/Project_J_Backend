@@ -10,8 +10,7 @@ import datetime
 
 import requests
 from flask import current_app
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature
-from itsdangerous import URLSafeSerializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from main.apis.v0_1.outputs import unauthorized, success, forbidden
 from main.plugins.extensions import db
@@ -37,7 +36,7 @@ class WX_User(db.Document):
     # countryCode = db.StringField(default=None)  # 区号
     # 微信官方获取手机号接口，暂不使用
 
-    invitation_code = db.StringField(default=None)
+    # invitation_code = db.StringField(default=None)
     # 邀请码供他人使用，详细说明见初始化
     invitees = db.IntField(default=None)
     # 被邀请人，别人的 uid
@@ -57,10 +56,14 @@ class WX_User(db.Document):
         else:
             return forbidden(r['errmsg'])
 
+    '''
     def init_invitation_code(self):
+        from itsdangerous import URLSafeSerializer
         s = URLSafeSerializer(current_app.config['SECRET_KEY'])
         self.invitation_code = s.dumps(self.uid)
         # 邀请码为 URL安全序列化（SECRET_KEY 参与计算）的结果，因此上次提交注销之前的 SECRET_KEY
+    # 邀请码使用用户 uid，故不使用此法（invitation_code 还太长……
+    '''
 
     def generate_token(self):
         expiration = 3600
@@ -71,6 +74,8 @@ class WX_User(db.Document):
         self.save()
         return {'token': self.token, 'expires_in': expiration}
 
+    '''
+    from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature
     def set_invitees(self, invitation_code):
         if self.invitees:
             return forbidden('你已填过邀请码')
@@ -80,6 +85,18 @@ class WX_User(db.Document):
         except BadSignature:
             return unauthorized('邀请码无效')
         self.invitees = invitees
+        self.points = 1000
+        self.save()
+        return success('1000 积分已到账')
+    '''
+
+    def set_invitees(self, uid):
+        if self.invitees:
+            return forbidden('你已填过邀请码')
+        query = WX_User.objects(uid=uid)
+        if not query:
+            return unauthorized('邀请码无效')
+        self.invitees = uid
         self.points = 1000
         self.save()
         return success('1000 积分已到账')
