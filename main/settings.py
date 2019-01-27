@@ -13,7 +13,14 @@ basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY', None)
-    MONGODB_SETTINGS = os.getenv('MONGODB_SETTINGS', None)
+    MONGODB_SETTINGS = {
+        'db': os.getenv('MONGODB_SETTING_DB', None),
+        'host': os.getenv('MONGODB_SETTING_HOST', None),
+        'port': 27017,
+        'username': os.getenv('MONGODB_SETTING_USERNAME', None),
+        'password': os.getenv('MONGODB_SETTING_PASSWORD', None),
+        'connect': False
+    }
     APPID = os.getenv('APPID', None)
     APPSECRET = os.getenv('APPSECRET', None)
     FAKE_NUM = os.getenv('FAKE_NUM', None)
