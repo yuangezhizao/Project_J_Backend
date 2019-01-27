@@ -68,7 +68,7 @@ def auth_required(f):
     return decorated
 
 
-@api_v0_1.route('/user/login')
+@api_v0_1.route('/user/login', methods=['GET', 'POST'])
 def user_login():
     try:
         wxcode = request.form.get('wxcode')
@@ -112,7 +112,7 @@ def user_login():
     return success(token)
 
 
-@api_v0_1.route('/user/set_invitees', methods=['POST'])
+@api_v0_1.route('/user/set_invitees', methods=['GET', 'POST'])
 @auth_required
 def user_set_invitees():
     try:
