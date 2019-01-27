@@ -125,12 +125,6 @@ def user_set_invitees():
     return r
 
 
-@api_v0_1.route('/user/invitation_code')
-@auth_required
-def user_invitation_code():
-    return success(g.user.uid)
-
-
 @api_v0_1.route('/user/points')
 @auth_required
 def user_points():
