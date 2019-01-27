@@ -70,6 +70,13 @@ class WX_User(db.Document):
         expiration = 3600
         # 令牌过期时间暂定为一小时
         s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        try:
+            s.loads(self.token)
+            return {'token': self.token}
+            # 令牌未过期，使用旧令牌
+        except Exception as e:
+            pass
+            # 令牌已过期，生成新令牌
         token = s.dumps({'uid': self.uid})
         self.token = token.decode('ascii')
         self.save()
