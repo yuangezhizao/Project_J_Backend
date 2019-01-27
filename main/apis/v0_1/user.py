@@ -73,11 +73,13 @@ def user_login():
     try:
         wxcode = request.form.get('wxcode')
         userinfo = request.form.get('userinfo')
-        rawData = request.form.get('rawData')
         signature = request.form.get('signature')
+        encryptedData = request.form.get('encryptedData')
         iv = request.form.get('iv')
-        print('rawData：' + rawData)
+        print('wxcode：' + wxcode)
+        print('userinfo：' + userinfo)
         print('signature：' + signature)
+        print('encryptedData：' + encryptedData)
         print('iv：' + iv)
         # TODO：开放数据校验与解密（防止伪造）
     except Exception as e:
