@@ -70,12 +70,13 @@ def auth_required(f):
 
 @api_v0_1.route('/user/login', methods=['GET', 'POST'])
 def user_login():
+    data = request.get_json()
     try:
-        wxcode = request.form.get('wxcode')
-        userinfo = request.form.get('userinfo')
-        signature = request.form.get('signature')
-        encryptedData = request.form.get('encryptedData')
-        iv = request.form.get('iv')
+        wxcode = data['wxcode']
+        userinfo = data['userinfo']
+        signature = data['signature']
+        encryptedData = data['encryptedData']
+        iv = data['iv']
         print('wxcode：' + wxcode)
         print('userinfo：' + userinfo)
         print('signature：' + signature)
@@ -85,7 +86,6 @@ def user_login():
     except Exception as e:
         print(e)
         return bad_request('参数错误')
-
     user = WX_User()
 
     data = user.code2Session(wxcode)
@@ -116,7 +116,7 @@ def user_login():
 @auth_required
 def user_set_invitees():
     try:
-        invitation_code = request.form.get('invitation_code')
+        invitation_code = request.get_json()['invitation_code']
     except Exception as e:
         print(e)
         return bad_request('参数错误')
