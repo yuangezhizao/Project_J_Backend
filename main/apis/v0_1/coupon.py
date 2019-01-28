@@ -14,7 +14,7 @@ from main.apis.v0_1.user import auth_required
 from main.models.coupon import Coupon
 
 
-@api_v0_1.route('/coupon')
+@api_v0_1.route('/coupon', methods=['GET', 'POST'])
 @auth_required
 def coupon_index():
     page = request.get_json()['page'] if (request.get_json() is not None) else 1
