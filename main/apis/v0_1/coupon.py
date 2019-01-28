@@ -17,7 +17,7 @@ from main.models.coupon import Coupon
 @api_v0_1.route('/coupon', methods=['GET', 'POST'])
 @auth_required
 def coupon_index():
-    page = request.get_json()['page'] if (request.get_json() is not None) else 1
+    page = request.get_json()['page'] if ((request.get_json() is not None) and ('page' in request.get_json())) else 1
     paginated_coupons = Coupon.objects.paginate(page=page, per_page=10)
     r = []
     for coupon in paginated_coupons.items:
