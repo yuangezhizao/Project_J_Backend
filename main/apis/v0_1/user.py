@@ -14,6 +14,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSigna
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import unauthorized, success, bad_request
 from main.models.user import WX_User
+from main.models.feedback import Feedback
 
 
 def validate_token(token):
@@ -141,3 +142,19 @@ def user_userinfo():
         # token 仅在登录接口处返回一次
     }
     return success(r)
+
+
+@api_v0_1.route('/user/feedback')
+@auth_required
+def user_feedback():
+    feedback = Feedback()
+    data = request.get_json()
+    try:
+        msg = data['msg']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    feedback.uid = g.user.uid
+    feedback.msg = msg
+    feedback.save()
+    return success('提交成功')
