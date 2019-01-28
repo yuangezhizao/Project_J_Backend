@@ -14,7 +14,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSigna
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import unauthorized, success, bad_request
 from main.models.user import WX_User
-from main.models.feedback import Feedback
+from main.models.feedback import WX_Feedback
 
 
 def validate_token(token):
@@ -147,7 +147,7 @@ def user_userinfo():
 @api_v0_1.route('/user/feedback')
 @auth_required
 def user_feedback():
-    feedback = Feedback()
+    feedback = WX_Feedback()
     data = request.get_json()
     try:
         msg = data['msg']
