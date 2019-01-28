@@ -17,4 +17,4 @@ class WX_Feedback(db.Document):
     }
     uid = db.IntField(required=True)  # 用户 uid
     msg = db.StringField(required=True)  # 意见反馈内容
-    insert_time = db.DateTimeField(default=datetime.datetime.now())
+    insert_time = db.DateTimeField(default=datetime.datetime.utcnow())
