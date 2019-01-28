@@ -9,7 +9,7 @@
 from flask import request
 
 from main.apis.v0_1 import api_v0_1
-from main.apis.v0_1.outputs import success
+from main.apis.v0_1.outputs import success, bad_request
 from main.apis.v0_1.user import auth_required
 from main.models.lottery import Lottery
 
@@ -22,9 +22,38 @@ def lottery_index():
     r = []
     for lottery in paginated_lotteries.items:
         new_lottery = {}
+        new_lottery['lotteryCode'] = lottery['lotteryCode'][:8]
         new_lottery['lotteryName'] = lottery['lotteryName']
         new_lottery['endTime'] = lottery['endTime'].strftime('%Y-%m-%d %H:%M:%S')
         r.append(new_lottery)
     next = page + 1 if paginated_lotteries.has_next else page
     r = {'coupons': r, 'next': next, 'pages': paginated_lotteries.pages, 'has_next': paginated_lotteries.has_next}
+    return success(r)
+
+
+@api_v0_1.route('/lottery_detail', methods=['GET', 'POST'])
+@auth_required
+def lottery_detail():
+    # TODO：积分判断扣减
+    try:
+        lotteryCode = request.get_json()['lotteryCode']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    lottery = Lottery.objects.search_text(lotteryCode).first()
+    new_lotteryPrize = []
+    for prize in lottery.lotteryPrize:
+        new_prize = {}
+        new_prize['prizeName'] = prize['prizeName']
+        new_prize['prizeDesc'] = prize['prizeDesc']
+        new_prize['sortOrder'] = prize['sortOrder']
+        new_lotteryPrize.append(new_prize)
+    r = {
+        'lotteryCode': lottery.lotteryCode,
+        'lotteryName': lottery.lotteryName,
+        'beginTime': lottery.beginTime.strftime('%Y-%m-%d %H:%M:%S'),
+        'endTime': lottery.endTime.strftime('%Y-%m-%d %H:%M:%S'),
+        'lotteryPrize': new_lotteryPrize,
+        'url': lottery.url
+    }
     return success(r)
