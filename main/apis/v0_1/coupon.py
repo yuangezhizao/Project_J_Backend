@@ -6,7 +6,7 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
-from flask import request
+from flask import request, g
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
@@ -34,7 +34,6 @@ def coupon_index():
 @api_v0_1.route('/coupon/detail', methods=['GET', 'POST'])
 @auth_required
 def coupon_detail():
-    # TODO：积分判断扣减
     try:
         key = request.get_json()['key']
     except Exception as e:
@@ -43,6 +42,9 @@ def coupon_detail():
     coupon = Coupon.objects(key=key).first()
     if coupon is None:
         return not_found('优惠券码无效')
+    result = g.user.unlock_action(key)
+    if result != 'Success':
+        return result
     r = {
         'key': coupon.key,
         'name': coupon.name,
