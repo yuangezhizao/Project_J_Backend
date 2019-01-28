@@ -13,6 +13,7 @@ flask-mongoengine = "*"
 python-dotenv = "*"
 requests = "*"
 flask-script = "*"
+raven = {extras = ["flask"]}
 
 
 [dev-packages]

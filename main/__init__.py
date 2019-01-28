@@ -14,6 +14,7 @@ from main.apis.v0_1 import api_v0_1
 from main.blueprints.main import main_bp
 from main.plugins.extensions import db
 from main.settings import config
+from raven.contrib.flask import Sentry
 
 
 def create_app(config_name=None):
@@ -33,6 +34,8 @@ def create_app(config_name=None):
 
 
 def register_extensions(app):
+    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
+    sentry.init_app(app)
     db.init_app(app)
 
 

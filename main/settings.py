@@ -24,6 +24,7 @@ class BaseConfig:
     APPID = os.getenv('APPID', None)
     APPSECRET = os.getenv('APPSECRET', None)
     FAKE_NUM = os.getenv('FAKE_NUM', None)
+    SENTRY_DSN = os.getenv('SENTRY_DSN', None)
 
 
 class DevelopmentConfig(BaseConfig):
