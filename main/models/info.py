@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
     :Author: yuangezhizao
-    :Time: 2019/1/28 0028 15:20
+    :Time: 2019/1/28 0028 15:34
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
@@ -11,10 +11,10 @@ import datetime
 from main.plugins.extensions import db
 
 
-class WX_Feedback(db.Document):
+class WX_Info(db.Document):
     meta = {
-        'collection': 'projectj_wx_feedback'
+        'collection': 'projectj_wx_info'
     }
-    uid = db.IntField(required=True)  # 用户 uid
-    msg = db.StringField(required=True)  # 意见反馈内容
+    title = db.StringField(required=True)  # 标题
+    content = db.StringField(required=True)  # 内容
     insert_time = db.DateTimeField(default=datetime.datetime.now())
