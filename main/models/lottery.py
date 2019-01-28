@@ -11,7 +11,13 @@ from main.plugins.extensions import db
 
 class Lottery(db.Document):
     meta = {
-        'collection': 'lottery_detail'
+        'collection': 'lottery_detail',
+        'indexes': [
+            {
+                'fields': ['$lotteryCode', ],
+                'default_language': 'english',
+            }
+        ]
     }
     lotteryCode = db.StringField(required=True, primary_key=True)  # 抽奖代码
     lotteryName = db.StringField(required=True)  # 抽奖名称
