@@ -40,9 +40,8 @@ class WX_User(db.Document):
     # 邀请码供他人使用，详细说明见初始化
     invitees = db.IntField(default=None)
     # 被邀请人，别人的 uid
-    points = db.IntField(default=0)
-
-    # 此处积分为零，详细说明见下方
+    points = db.IntField(default=1000)
+    # 初始化积分为 1000
 
     def code2Session(self, wxcode):
         url = 'https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code'.format(
