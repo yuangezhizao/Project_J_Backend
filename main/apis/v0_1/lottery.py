@@ -22,7 +22,7 @@ def lottery_index():
     r = []
     for lottery in paginated_lotteries.items:
         new_lottery = {}
-        new_lottery['lotteryCode'] = lottery['lotteryCode'][:8]
+        new_lottery['lotteryCode'] = lottery['lotteryCode']
         new_lottery['lotteryName'] = lottery['lotteryName']
         new_lottery['endTime'] = lottery['endTime'].strftime('%Y-%m-%d %H:%M:%S')
         r.append(new_lottery)
@@ -40,7 +40,7 @@ def lottery_detail():
     except Exception as e:
         print(e)
         return bad_request('参数错误')
-    lottery = Lottery.objects.search_text(lotteryCode).first()
+    lottery = Lottery.objects(lotteryCode=lotteryCode).first()
     new_lotteryPrize = []
     for prize in lottery.lotteryPrize:
         new_prize = {}
