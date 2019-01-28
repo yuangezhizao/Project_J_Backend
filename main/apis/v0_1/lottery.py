@@ -31,7 +31,7 @@ def lottery_index():
     return success(r)
 
 
-@api_v0_1.route('/lottery_detail', methods=['GET', 'POST'])
+@api_v0_1.route('/lottery/detail', methods=['GET', 'POST'])
 @auth_required
 def lottery_detail():
     # TODO：积分判断扣减
