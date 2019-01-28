@@ -6,6 +6,8 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
+import datetime
+
 from flask import request
 
 from main.apis.v0_1 import api_v0_1
@@ -18,7 +20,8 @@ from main.models.lottery import Lottery
 @auth_required
 def lottery_index():
     page = request.get_json()['page'] if ((request.get_json() is not None) and ('page' in request.get_json())) else 1
-    paginated_lotteries = Lottery.objects.paginate(page=page, per_page=10)
+    now_time = datetime.datetime.now()
+    paginated_lotteries = Lottery.objects(endTime__gt=now_time).order_by('endTime').paginate(page=page, per_page=10)
     r = []
     for lottery in paginated_lotteries.items:
         new_lottery = {}
