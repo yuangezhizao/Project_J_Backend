@@ -9,7 +9,7 @@
 from flask import request
 
 from main.apis.v0_1 import api_v0_1
-from main.apis.v0_1.outputs import success, bad_request
+from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
 from main.models.coupon import Coupon
 
@@ -41,6 +41,8 @@ def coupon_detail():
         print(e)
         return bad_request('参数错误')
     coupon = Coupon.objects(key=key).first()
+    if coupon is None:
+        return not_found('优惠券无效')
     r = {
         'key': coupon.key,
         'name': coupon.name,

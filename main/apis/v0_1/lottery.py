@@ -11,7 +11,7 @@ import datetime
 from flask import request
 
 from main.apis.v0_1 import api_v0_1
-from main.apis.v0_1.outputs import success, bad_request
+from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
 from main.models.lottery import Lottery
 
@@ -44,6 +44,8 @@ def lottery_detail():
         print(e)
         return bad_request('参数错误')
     lottery = Lottery.objects(lotteryCode=lotteryCode).first()
+    if lottery is None:
+        return not_found('抽奖码无效')
     new_lotteryPrize = []
     for prize in lottery.lotteryPrize:
         new_prize = {}
