@@ -28,8 +28,8 @@ class WX_User(db.Document):
     userinfo = db.DictField(default=None)  # 用户信息对象，不包含 openid 等敏感信息（前端传入）
 
     token = db.StringField(default=None)  # 开发者服务器自定义登录态
-    member_since = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户登录时间（填写完邀请码之后才算注册）
-    last_seen = db.DateTimeField(default=datetime.datetime.utcnow)  # 用户刷新 token 时间
+    member_since = db.DateTimeField(default=datetime.datetime.now())  # 用户登录时间（填写完邀请码之后才算注册）
+    last_seen = db.DateTimeField(default=datetime.datetime.now())  # 用户刷新 token 时间
 
     # phonenumber = db.StringField(default=None)  # 用户绑定的手机号（国外手机号会有区号）
     # purePhoneNumber = db.StringField(default=None)  # 没有区号的手机号
