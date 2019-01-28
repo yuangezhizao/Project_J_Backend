@@ -22,4 +22,6 @@ def coupon_index():
     r = []
     for coupon in paginated_coupons.items:
         r.append(coupon)
-    return success({'coupons': r, 'pages': paginated_coupons.pages, 'has_next': paginated_coupons.has_next})
+    next = page + 1 if paginated_coupons.has_next else page
+    return success(
+        {'coupons': r, 'next': next, 'pages': paginated_coupons.pages, 'has_next': paginated_coupons.has_next})
