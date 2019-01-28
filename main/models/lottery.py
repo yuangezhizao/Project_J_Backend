@@ -19,3 +19,9 @@ class Lottery(db.Document):
     endTime = db.DateTimeField(required=True)  # 结束时间
     lotteryPrize = db.ListField(required=True)  # 抽奖奖品
     url = db.StringField(required=True)  # 抽奖地址
+    # 路由处使用 paginate，则模型必须填写完整字段
+    update_time = db.DateTimeField(required=True)  # 插入时间
+    accessMethod = db.IntField(required=True)  # 略
+    jbeanAmount = db.IntField(required=True)  # 略
+    promptImg = db.StringField(required=True)  # 图片
+    lotteryCreator = db.StringField(required=True)  # 抽奖创建者
