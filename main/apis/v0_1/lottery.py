@@ -8,7 +8,7 @@
 """
 import datetime
 
-from flask import request
+from flask import request, g
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
@@ -37,7 +37,6 @@ def lottery_index():
 @api_v0_1.route('/lottery/detail', methods=['GET', 'POST'])
 @auth_required
 def lottery_detail():
-    # TODO：积分判断扣减
     try:
         lotteryCode = request.get_json()['lotteryCode']
     except Exception as e:
@@ -46,6 +45,9 @@ def lottery_detail():
     lottery = Lottery.objects(lotteryCode=lotteryCode).first()
     if lottery is None:
         return not_found('抽奖码无效')
+    result = g.user.unlock_action(lottery)
+    if result != 'Success':
+        return result
     new_lotteryPrize = []
     for prize in lottery.lotteryPrize:
         new_prize = {}

@@ -14,6 +14,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from main.apis.v0_1.outputs import unauthorized, success, forbidden
 from main.plugins.extensions import db
+from main.models.point import WX_Point
 
 
 class WX_User(db.Document):
@@ -41,6 +42,7 @@ class WX_User(db.Document):
     invitees = db.IntField(default=None)
     # 被邀请人，别人的 uid
     points = db.IntField(default=1000)
+
     # 初始化积分为 1000
 
     def code2Session(self, wxcode):
@@ -114,3 +116,16 @@ class WX_User(db.Document):
         self.points = 1000
         self.save()
         return success('1000 积分已到账')
+
+    def unlock_action(self, value):
+        if self.points > 0:
+            if not WX_Point.objects(uid=self.uid, value=value):
+                point = WX_Point()
+                point.uid = self.uid
+                point.value = value
+                point.save()
+                self.points = self.points - 1
+                self.save()
+            return 'Success'
+        else:
+            return forbidden('用户积分不足')
