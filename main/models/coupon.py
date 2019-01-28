@@ -6,7 +6,6 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
-
 from main.plugins.extensions import db
 
 
