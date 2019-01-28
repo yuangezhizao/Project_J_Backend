@@ -42,10 +42,12 @@ def coupon_detail():
         return bad_request('参数错误')
     coupon = Coupon.objects(key=key).first()
     if coupon is None:
-        return not_found('优惠券无效')
+        return not_found('优惠券码无效')
     r = {
         'key': coupon.key,
         'name': coupon.name,
         'strength': coupon.strength,
+        # 'act_url': coupon.act_url,
+        # 'url': coupon.url
     }
     return success(r)
