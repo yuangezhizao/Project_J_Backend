@@ -144,16 +144,15 @@ def user_userinfo():
     return success(r)
 
 
-@api_v0_1.route('/user/feedback')
+@api_v0_1.route('/user/feedback', methods=['GET', 'POST'])
 @auth_required
 def user_feedback():
-    feedback = WX_Feedback()
-    data = request.get_json()
     try:
-        msg = data['msg']
+        msg = request.get_json()['msg']
     except Exception as e:
         print(e)
         return bad_request('参数错误')
+    feedback = WX_Feedback()
     feedback.uid = g.user.uid
     feedback.msg = msg
     feedback.save()
