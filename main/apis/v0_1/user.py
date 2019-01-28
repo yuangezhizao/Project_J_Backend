@@ -125,7 +125,19 @@ def user_set_invitees():
     return r
 
 
-@api_v0_1.route('/user/points')
+@api_v0_1.route('/user/userinfo')
 @auth_required
-def user_points():
-    return success(g.user.points)
+def user_userinfo():
+    user = g.user
+    userinfo = user.userinfo
+    r = {
+        'uid': user.uid,
+        'nickname': userinfo['nickName'],
+        'gender': userinfo['gender'],
+        'avatarurl': userinfo['avatarUrl'],
+        'member_since': user['member_since'].strftime('%Y-%m-%d %H:%M:%S'),
+        'points': user['points'],
+        # 'token': userinfo.token
+        # token 仅在登录接口处返回一次
+    }
+    return success(r)
