@@ -118,14 +118,14 @@ class WX_User(db.Document):
         return success('1000 积分已到账')
 
     def unlock_action(self, value):
-        if self.points > 0:
-            if not WX_Point.objects(uid=self.uid, value=value):
+        if not WX_Point.objects(uid=self.uid, value=value):
+            if self.points > 0:
                 point = WX_Point()
                 point.uid = self.uid
                 point.value = value
                 point.save()
                 self.points = self.points - 1
                 self.save()
-            return 'Success'
-        else:
-            return forbidden('用户积分不足')
+            else:
+                return forbidden('用户积分不足')
+        return 'Success'
