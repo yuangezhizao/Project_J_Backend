@@ -85,7 +85,7 @@ class WX_User(db.Document):
         return {'token': self.token, 'expires_in': expiration}
 
     def ping(self):
-        now_time = datetime.datetime.utcnow
+        now_time = datetime.datetime.utcnow()
         self.last_seen = now_time
         self.save()
 
