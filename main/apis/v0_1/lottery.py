@@ -45,7 +45,7 @@ def lottery_detail():
     lottery = Lottery.objects(lotteryCode=lotteryCode).first()
     if lottery is None:
         return not_found('抽奖码无效')
-    result = g.user.unlock_action(lottery)
+    result = g.user.unlock_action(lotteryCode)
     if result != 'Success':
         return result
     new_lotteryPrize = []
