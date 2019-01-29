@@ -15,6 +15,6 @@ class WX_Point(db.Document):
     meta = {
         'collection': 'projectj_wx_points'
     }
-    uid = db.StringField(required=True)  # 用户 uid
+    uid = db.IntField(required=True)  # 用户 uid
     value = db.StringField(required=True)  # 已解锁值
     insert_time = db.DateTimeField(default=datetime.datetime.utcnow())
