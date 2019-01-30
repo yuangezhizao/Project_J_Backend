@@ -144,7 +144,7 @@ def user_inviter():
     except Exception as e:
         print(e)
         return bad_request('参数错误')
-    invite_result = g.user.invite_action(g.user.uid, from_uid, None, None)
+    invite_result = g.user.invite_action(from_uid, None, None)
     if isinstance(invite_result, list):
         uid, insert_time = invite_result
     else:
