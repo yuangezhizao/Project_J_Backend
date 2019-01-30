@@ -10,7 +10,7 @@ from flask import request, g
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
-from main.apis.v0_1.user import auth_required, save_invite
+from main.apis.v0_1.user import auth_required
 from main.models.coupon import Coupon
 
 
@@ -33,7 +33,6 @@ def coupon_index():
 
 @api_v0_1.route('/coupon/detail', methods=['GET', 'POST'])
 @auth_required
-@save_invite
 def coupon_detail():
     try:
         key = request.get_json()['key']
