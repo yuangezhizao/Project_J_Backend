@@ -12,9 +12,10 @@ import requests
 from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
-from main.apis.v0_1.outputs import unauthorized, success, forbidden
-from main.plugins.extensions import db
+from main.apis.v0_1.outputs import forbidden
+from main.models.invite import WX_Invite
 from main.models.unlock import WX_Unlock
+from main.plugins.extensions import db
 
 
 class WX_User(db.Document):
@@ -39,8 +40,8 @@ class WX_User(db.Document):
 
     # invitation_code = db.StringField(default=None)
     # 邀请码供他人使用，详细说明见初始化
-    invitees = db.IntField(default=None)
-    # 被邀请人，别人的 uid
+    inviter = db.IntField(default=None)
+    # 邀请人，上家的 uid
     points = db.IntField(default=1000)
 
     # 初始化积分为 1000
@@ -105,17 +106,42 @@ class WX_User(db.Document):
         return success('1000 积分已到账')
     '''
 
-    def set_invitees(self, invitation_code):
-        if self.invitees:
-            return forbidden('你已填过邀请码')
-        uid = invitation_code - current_app.config['FAKE_NUM']
-        query = WX_User.objects(uid=uid)
-        if not query:
-            return unauthorized('邀请码无效')
-        self.invitees = uid
-        self.points = 1000
-        self.save()
-        return success('1000 积分已到账')
+    def invite_check(self, from_uid):
+        check = WX_Invite.objects(uid=self.uid, from_uid=from_uid).first()
+        if not check:
+            return ''
+        else:
+            return check.insert_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    def invite_action(self, from_uid, type, value):
+        if not self.inviter:
+            # 此处也可如下判断
+            # action = WX_Invite.objects(uid=self.uid, from_uid=from_uid).first()
+            # 未邀请，入库
+            query = WX_User.objects(uid=from_uid)
+            # 此处与解锁动作不同，需验证 from_uid 真实性
+            if query:
+                user = query.first()
+                points = user.points
+                points += 100
+                # 暂定邀请成功给与邀请人 100 积分
+                query.update_one(set__points=points, )
+            else:
+                return forbidden('邀请人异常')
+            invite = WX_Invite()
+            invite.uid = self.uid
+            invite.from_uid = from_uid
+            invite.type = type
+            invite.value = value
+            invite.save()
+            # 关联表保存
+            self.inviter = from_uid
+            self.save()
+            # 用户表保存
+            insert_time = invite.insert_time.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            return forbidden('已填写过邀请人')
+        return [self.uid, insert_time]
 
     def unlock_check(self, value):
         check = WX_Unlock.objects(uid=self.uid, value=value).first()
@@ -130,15 +156,15 @@ class WX_User(db.Document):
             # 未解锁，扣减积分
             if self.points > 0:
                 # 积分大于零，走扣减流程
-                point = WX_Unlock()
-                point.uid = self.uid
-                point.value = value
-                point.save()
+                unlock = WX_Unlock()
+                unlock.uid = self.uid
+                unlock.value = value
+                unlock.save()
                 # 关联表保存
                 self.points = self.points - 1
                 self.save()
                 # 用户表保存
-                insert_time = point.insert_time.strftime('%Y-%m-%d %H:%M:%S')
+                insert_time = unlock.insert_time.strftime('%Y-%m-%d %H:%M:%S')
             else:
                 # 积分小于零，无法兑换
                 return forbidden('用户积分不足')
