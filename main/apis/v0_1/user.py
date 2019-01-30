@@ -101,7 +101,7 @@ def user_login():
                          # set__unionid=unionid,
                          set__userinfo=eval(userinfo)
                          )
-        user = query[0]
+        user = query.first()
     else:
         user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
         user.openid = openid
