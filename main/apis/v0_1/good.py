@@ -44,7 +44,7 @@ def good_detail():
         return not_found('商品码无效')
     r = {
         'sku': good.sku,
-        'title': good.title,
+        'title': good.title.strip(),
         'prize': good.prize,
     }
     return success(r)
