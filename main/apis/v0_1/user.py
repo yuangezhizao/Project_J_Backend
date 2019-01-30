@@ -100,7 +100,7 @@ def user_login():
         signature = data['signature']
         encryptedData = data['encryptedData']
         iv = data['iv']
-        from_uid = data['formUID'] if ('formUID' in data) else -1
+        from_uid = data['formUID'] if (('formUID' in data) and isinstance(data['formUID'], int)) else -1
         print('wxcode：' + wxcode)
         print('userinfo：' + userinfo)
         print('signature：' + signature)
