@@ -26,7 +26,7 @@ def validate_token(token):
     except BadSignature:
         return 'BadSignature'  # invalid token
     # 以下来自 def _get_openid_token(token):
-    query = WX_User.objects(uid=data['uid'])[0]
+    query = WX_User.objects(uid=data['uid']).first()
     g.user = query  # 用户信息放到 g 中以便使用
     return True
 
