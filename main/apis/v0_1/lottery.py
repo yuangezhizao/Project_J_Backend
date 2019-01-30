@@ -12,7 +12,7 @@ from flask import request, g
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
-from main.apis.v0_1.user import auth_required
+from main.apis.v0_1.user import auth_required, save_invite
 from main.models.lottery import Lottery
 
 
@@ -36,6 +36,7 @@ def lottery_index():
 
 @api_v0_1.route('/lottery/detail', methods=['GET', 'POST'])
 @auth_required
+@save_invite
 def lottery_detail():
     try:
         lotteryCode = request.get_json()['lotteryCode']
