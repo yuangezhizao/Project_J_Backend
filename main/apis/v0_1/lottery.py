@@ -45,9 +45,6 @@ def lottery_detail():
     lottery = Lottery.objects(lotteryCode=lotteryCode).first()
     if lottery is None:
         return not_found('抽奖码无效')
-    result = g.user.unlock_action(lotteryCode)
-    if result != 'Success':
-        return result
     new_lotteryPrize = []
     for prize in lottery.lotteryPrize:
         new_prize = {}
@@ -55,12 +52,60 @@ def lottery_detail():
         new_prize['prizeDesc'] = prize['prizeDesc']
         new_prize['sortOrder'] = prize['sortOrder']
         new_lotteryPrize.append(new_prize)
+    status = -1 if (g.user.points == 0) else 1  # 默认需要解锁，返回 1，积分不足返回 -1
+    check_result = g.user.unlock_check(lotteryCode)
+    if check_result != '':
+        status = 0  # 已经解锁
     r = {
         'lotteryCode': lottery.lotteryCode,
         'lotteryName': lottery.lotteryName,
         'beginTime': lottery.beginTime.strftime('%Y-%m-%d %H:%M:%S'),
         'endTime': lottery.endTime.strftime('%Y-%m-%d %H:%M:%S'),
         'lotteryPrize': new_lotteryPrize,
-        'url': lottery.url
+        # 'url': lottery.url
+        # url 为解锁字段
+        'sellingpoints': 1,
+        'points': g.user.points,
+        'status': status,
+        'unlock_Time': check_result,
+    }
+    return success(r)
+
+
+@api_v0_1.route('/lottery/unlock', methods=['GET', 'POST'])
+@auth_required
+def lottery_unlock():
+    try:
+        lotteryCode = request.get_json()['lotteryCode']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    lottery = Lottery.objects(lotteryCode=lotteryCode).first()
+    if lottery is None:
+        return not_found('抽奖码无效')
+    new_lotteryPrize = []
+    for prize in lottery.lotteryPrize:
+        new_prize = {}
+        new_prize['prizeName'] = prize['prizeName']
+        new_prize['prizeDesc'] = prize['prizeDesc']
+        new_prize['sortOrder'] = prize['sortOrder']
+        new_lotteryPrize.append(new_prize)
+    status = -1 if (g.user.points == 0) else 1  # 默认需要解锁，返回 1，积分不足返回 -1
+    check_result = g.user.unlock_check(lotteryCode)
+    if check_result != '':
+        status = 0  # 已经解锁
+    else:
+        result = g.user.unlock_action(lotteryCode)
+        if isinstance(result, list):
+            uid, check_result = result
+            status = 0  # 解锁成功
+        else:
+            return result
+    r = {
+        'url': lottery.url,
+        # url 为解锁字段
+        'points': g.user.points,
+        'status': status,
+        'unlock_Time': check_result,
     }
     return success(r)
