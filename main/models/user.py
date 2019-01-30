@@ -14,7 +14,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 from main.apis.v0_1.outputs import unauthorized, success, forbidden
 from main.plugins.extensions import db
-from main.models.point import WX_Point
+from main.models.unlock import WX_Unlock
 
 
 class WX_User(db.Document):
@@ -118,19 +118,19 @@ class WX_User(db.Document):
         return success('1000 积分已到账')
 
     def unlock_check(self, value):
-        check = WX_Point.objects(uid=self.uid, value=value).first()
+        check = WX_Unlock.objects(uid=self.uid, value=value).first()
         if not check:
             return ''
         else:
             return check.insert_time.strftime('%Y-%m-%d %H:%M:%S')
 
     def unlock_action(self, value):
-        action = WX_Point.objects(uid=self.uid, value=value).first()
+        action = WX_Unlock.objects(uid=self.uid, value=value).first()
         if not action:
             # 未解锁，扣减积分
             if self.points > 0:
                 # 积分大于零，走扣减流程
-                point = WX_Point()
+                point = WX_Unlock()
                 point.uid = self.uid
                 point.value = value
                 point.save()

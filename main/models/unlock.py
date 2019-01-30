@@ -11,9 +11,9 @@ import datetime
 from main.plugins.extensions import db
 
 
-class WX_Point(db.Document):
+class WX_Unlock(db.Document):
     meta = {
-        'collection': 'projectj_wx_points'
+        'collection': 'projectj_wx_unlocks'
     }
     uid = db.IntField(required=True)  # 用户 uid
     value = db.StringField(required=True)  # 已解锁值
