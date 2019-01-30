@@ -118,6 +118,8 @@ class WX_User(db.Document):
             # 此处也可如下判断
             # action = WX_Invite.objects(uid=self.uid, from_uid=from_uid).first()
             # 未邀请，入库
+            if from_uid == self.uid:
+                return forbidden('你不能自己邀请自己')
             query = WX_User.objects(uid=from_uid)
             # 此处与解锁动作不同，需验证 from_uid 真实性
             if query:
