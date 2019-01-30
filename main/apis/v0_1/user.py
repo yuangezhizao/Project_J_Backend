@@ -150,7 +150,7 @@ def user_inviter():
     else:
         return invite_result
     r = {
-        'unlock_Time': insert_time
+        'invite_Time': insert_time
     }
     return success(r)
 
