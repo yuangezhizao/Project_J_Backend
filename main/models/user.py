@@ -117,15 +117,31 @@ class WX_User(db.Document):
         self.save()
         return success('1000 积分已到账')
 
+    def unlock_check(self, value):
+        check = WX_Point.objects(uid=self.uid, value=value).first()
+        if not check:
+            return ''
+        else:
+            return check.insert_time.strftime('%Y-%m-%d %H:%M:%S')
+
     def unlock_action(self, value):
-        if not WX_Point.objects(uid=self.uid, value=value):
+        action = WX_Point.objects(uid=self.uid, value=value).first()
+        if not action:
+            # 未解锁，扣减积分
             if self.points > 0:
+                # 积分大于零，走扣减流程
                 point = WX_Point()
                 point.uid = self.uid
                 point.value = value
                 point.save()
+                # 关联表保存
                 self.points = self.points - 1
                 self.save()
+                # 用户表保存
+                insert_time = point.insert_time.strftime('%Y-%m-%d %H:%M:%S')
             else:
+                # 积分小于零，无法兑换
                 return forbidden('用户积分不足')
-        return 'Success'
+        else:
+            insert_time = action.insert_time.strftime('%Y-%m-%d %H:%M:%S')
+        return [self.uid, insert_time]
