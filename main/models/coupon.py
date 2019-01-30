@@ -18,3 +18,5 @@ class Coupon(db.Document):
     strength = db.StringField(required=True)  # 优惠力度
     act_url = db.StringField(required=True)  # 活动地址
     url = db.StringField(required=True)  # 优惠券地址
+    beginTime = db.DateTimeField(required=True)  # 开始时间
+    endTime = db.DateTimeField(required=True)  # 结束时间
