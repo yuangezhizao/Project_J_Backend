@@ -17,6 +17,6 @@ class WX_Invite(db.Document):
     }
     uid = db.IntField(required=True)  # 用户 uid
     from_uid = db.IntField(required=True)  # 上家 uid
-    type = db.IntField(required=True)  # 类型
-    value = db.StringField(required=True)  # 值
+    type = db.IntField()  # 类型
+    value = db.StringField()  # 值
     insert_time = db.DateTimeField(default=datetime.datetime.utcnow())
