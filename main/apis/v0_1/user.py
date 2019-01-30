@@ -100,6 +100,7 @@ def user_login():
         signature = data['signature']
         encryptedData = data['encryptedData']
         iv = data['iv']
+        from_uid = data['from_uid'] if ('from_uid' in data) else -1
         print('wxcode：' + wxcode)
         print('userinfo：' + userinfo)
         print('signature：' + signature)
@@ -131,6 +132,7 @@ def user_login():
         # user.unionid = unionid
         user.userinfo = eval(userinfo)
         user.save()
+        user.invite_action(from_uid, 1, None)
         # user.init_invitation_code()
     token = user.generate_token()
     return success(token)
