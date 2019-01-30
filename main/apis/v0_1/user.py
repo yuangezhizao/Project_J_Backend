@@ -106,7 +106,7 @@ def user_login():
         print('signature：' + signature)
         print('encryptedData：' + encryptedData)
         print('iv：' + iv)
-        print('formUID：' + from_uid)
+        print('formUID：' + str(from_uid))
         # TODO：开放数据校验与解密（防止伪造）
     except Exception as e:
         print(e)
