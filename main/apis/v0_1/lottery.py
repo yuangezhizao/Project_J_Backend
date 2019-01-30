@@ -103,7 +103,6 @@ def lottery_unlock():
             return result
     r = {
         'url': lottery.url,
-        # url 为解锁字段
         'points': g.user.points,
         'status': status,
         'unlock_Time': check_result,

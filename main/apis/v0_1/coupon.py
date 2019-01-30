@@ -42,14 +42,56 @@ def coupon_detail():
     coupon = Coupon.objects(key=key).first()
     if coupon is None:
         return not_found('优惠券码无效')
-    result = g.user.unlock_action(key)
-    if result != 'Success':
-        return result
+    status = -1 if (g.user.points == 0) else 1  # 默认需要解锁，返回 1，积分不足返回 -1
+    check_result = g.user.unlock_check(coupon.key)
+    if check_result != '':
+        status = 0  # 已经解锁
     r = {
         'key': coupon.key,
         'name': coupon.name,
         'strength': coupon.strength,
+        'beginTime': coupon.beginTime,
+        'endTime': coupon.endTime,
         # 'act_url': coupon.act_url,
         # 'url': coupon.url
+        # 注释为解锁字段
+        'sellingpoints': 1,
+        'points': g.user.points,
+        'status': status,
+        'unlock_Time': check_result,
+    }
+    return success(r)
+
+
+@api_v0_1.route('/coupon/unlock', methods=['GET', 'POST'])
+@auth_required
+def coupon_unlock():
+    try:
+        key = request.get_json()['key']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    coupon = Coupon.objects(key=key).first()
+    if coupon is None:
+        return not_found('优惠券码无效')
+    status = -1 if (g.user.points == 0) else 1  # 默认需要解锁，返回 1，积分不足返回 -1
+    check_result = g.user.unlock_check(coupon.key)
+    if check_result != '':
+        status = 0  # 已经解锁
+    else:
+        result = g.user.unlock_action(coupon.key)
+        if isinstance(result, list):
+            uid, check_result = result
+            status = 0  # 解锁成功
+        else:
+            return result
+    r = {
+        'act_url': coupon.act_url,
+        'url': coupon.url,
+        'beginTime': coupon.beginTime,
+        'endTime': coupon.endTime,
+        'points': g.user.points,
+        'status': status,
+        'unlock_Time': check_result,
     }
     return success(r)
