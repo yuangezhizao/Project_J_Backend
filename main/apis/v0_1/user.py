@@ -13,8 +13,8 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSigna
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import unauthorized, success, bad_request
-from main.models.user import WX_User
 from main.models.feedback import WX_Feedback
+from main.models.user import WX_User
 
 
 def validate_token(token):
@@ -136,16 +136,23 @@ def user_login():
     return success(token)
 
 
-@api_v0_1.route('/user/set_invitees', methods=['GET', 'POST'])
+@api_v0_1.route('/user/inviter', methods=['GET', 'POST'])
 @auth_required
-def user_set_invitees():
+def user_inviter():
     try:
-        invitation_code = request.get_json()['invitation_code']
+        from_uid = request.get_json()['from_uid']
     except Exception as e:
         print(e)
         return bad_request('参数错误')
-    r = g.user.set_invitees(invitation_code)
-    return r
+    invite_result = g.user.invite_action(g.user.uid, from_uid, None, None)
+    if isinstance(invite_result, list):
+        uid, insert_time = invite_result
+    else:
+        return invite_result
+    r = {
+        'unlock_Time': insert_time
+    }
+    return success(r)
 
 
 @api_v0_1.route('/user/userinfo')
