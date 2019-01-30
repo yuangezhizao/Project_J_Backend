@@ -69,6 +69,28 @@ def auth_required(f):
     return decorated
 
 
+def save_invite(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        from_uid = request.get_json()['from_uid'] if (
+                (request.get_json() is not None) and ('from_uid' in request.get_json())) else None
+        if from_uid:
+            if not g.user.inviter:
+                key = request.args.get('key', None)
+                lotteryCode = request.args.get('lotteryCode', None)
+                if key:
+                    g.user.invite_action(g.user.uid, from_uid, 1, key)
+                elif lotteryCode:
+                    g.user.invite_action(g.user.uid, from_uid, 2, lotteryCode)
+                else:
+                    pass
+        else:
+            pass
+        return f(*args, **kwargs)
+
+    return decorated
+
+
 @api_v0_1.route('/user/login', methods=['GET', 'POST'])
 def user_login():
     data = request.get_json()
