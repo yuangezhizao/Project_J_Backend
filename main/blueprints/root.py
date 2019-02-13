@@ -8,14 +8,14 @@
 """
 from flask import Blueprint
 
-main_bp = Blueprint('main', __name__)
+root_bp = Blueprint('root', __name__)
 
 
-@main_bp.route('/')
+@root_bp.route('/')
 def hello_world():
     return 'Hello, Flask!'
 
 
-@main_bp.route('/jd_root.txt')
+@root_bp.route('/jd_root.txt')
 def jd_verify():
     return 'e95d2f4a675fe6f2b231093ef0892219c03e13e310499f23'

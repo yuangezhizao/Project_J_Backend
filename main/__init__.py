@@ -11,7 +11,8 @@ import os
 from flask import Flask
 
 from main.apis.v0_1 import api_v0_1
-from main.blueprints.main import main_bp
+from main.blueprints.admin import admin_bp
+from main.blueprints.root import root_bp
 from main.plugins.extensions import db
 from main.settings import config
 from raven.contrib.flask import Sentry
@@ -40,7 +41,7 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    app.register_blueprint(main_bp, url_prefix='/')
+    app.register_blueprint(root_bp, url_prefix='/')
     app.register_blueprint(api_v0_1, url_prefix='/api/v0_1')
 
 
