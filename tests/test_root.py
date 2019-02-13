@@ -17,8 +17,3 @@ class RootTestCase(BaseTestCase):
         response = self.client.get(url_for('root.hello_world'))
         data = response.get_data(as_text=True)
         self.assertIn('Hello, Flask!', data)
-
-    def test_jd_verify(self):
-        response = self.client.get(url_for('root.jd_verify'))
-        data = response.get_data(as_text=True)
-        self.assertIn('e95d2f4a675fe6f2b231093ef0892219c03e13e310499f23', data)
