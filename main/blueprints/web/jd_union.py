@@ -6,9 +6,9 @@
     :Site: https://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 
-web_bp = Blueprint('web', __name__)
+from . import web_bp
 
 
 @web_bp.route('/jd_union/create_url')
