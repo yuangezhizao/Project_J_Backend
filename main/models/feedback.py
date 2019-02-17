@@ -13,7 +13,7 @@ from main.plugins.extensions import db
 
 class WX_Feedback(db.Document):
     meta = {
-        'collection': 'projectj_wx_feedback'
+        'collection': 'projectj_wx_feedbacks'
     }
     uid = db.IntField(required=True)  # 用户 uid
     msg = db.StringField(required=True)  # 意见反馈内容
