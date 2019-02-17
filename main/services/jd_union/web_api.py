@@ -117,7 +117,7 @@ class WebApi:
         data = {'data': {'siteId': social_media_id, 'spaceName': sub_name, 'type': '3'}}
         r = requests.post(self.BASE_URL + self.SAVE_PROMOTION_SITE_METHOD, data=json.dumps(data),
                           headers=self.headers).json()
-        result = self.get_social_media_loc_list(social_media_id)
+        result = self.get_social_media_loc_list_full()
         if isinstance(result, bool):
             result = 'Update success'
         else:
@@ -135,7 +135,7 @@ class WebApi:
             self.conn['jdunion_socialmedia_loc'].remove({'_id': sub_pid})
         else:
             print(str(r))
-        result = self.get_social_media_loc_list(social_media_id)
+        result = self.get_social_media_loc_list_full()
         if isinstance(result, bool):
             result = 'Update success'
         else:
@@ -151,7 +151,6 @@ class WebApi:
         r = requests.post(self.BASE_URL + self.QUERY_PROMOTION_SITE_LISTS, data=json.dumps(data),
                           headers=self.headers).json()
         if r['code'] == 200:
-            self.conn['jdunion_socialmedia_loc'].drop()
             result = r['data']
             for each in result['promotionLists']:
                 each['_id'] = each['id']
@@ -174,6 +173,18 @@ class WebApi:
         #     result.append(each)
         # return result
         # 鉴于要加上分页操作，不再此处返回结果
+
+    def get_social_media_loc_list_full(self):  # page 参数无需手动传入
+        self.conn['jdunion_socialmedia_loc'].drop()
+        for each in self.conn['jdunion_socialmedia'].find():
+            social_media_id = each['_id']
+            result = self.get_social_media_loc_list(social_media_id)
+            if isinstance(result, bool):
+                result = 'Update success'
+            else:
+                result = 'Update failed'
+        return True
+        # TODO：全部更新完成才算成功
 
     def get_social_media_by_args(self, social_media_id='', social_media_name='', channel_url='', account=''):
         args = {}
