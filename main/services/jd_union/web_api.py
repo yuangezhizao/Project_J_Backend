@@ -50,6 +50,11 @@ class WebApi:
         data = {'data': {'homeUrl': channel_url, 'loginAccount': account, 'mediaName': social_media_name}}
         r = requests.post(self.BASE_URL + self.SAVE_GUIDE_SOCIAL_METHOD, data=json.dumps(data),
                           headers=self.headers).json()
+        result = self.get_social_media_list()
+        if isinstance(result, bool):
+            result = 'Update success'
+        else:
+            result = 'Update failed'
         return r
 
     def remove_social_media(self, social_media_id):
@@ -61,6 +66,11 @@ class WebApi:
             self.conn['jdunion_socialmedia'].remove({'_id': social_media_id})
         else:
             print(str(r))
+        result = self.get_social_media_list()
+        if isinstance(result, bool):
+            result = 'Update success'
+        else:
+            result = 'Update failed'
         return r
 
     def get_social_media_list(self, page=1):  # page 参数无需手动传入
