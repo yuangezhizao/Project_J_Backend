@@ -10,6 +10,7 @@ from flask import request, jsonify
 
 from main.apis.v0_1.outputs import success
 from main.models.socialmedia import Socialmedia
+from main.models.socialmedia_loc import Socialmedia_Loc
 from . import web_bp
 
 
@@ -76,18 +77,34 @@ def jd_union_create_social_media_loc():
 def jd_union_remove_social_media_loc():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
-    social_media_id = request.args.get('social_media_id')
     sub_pid = request.args.get('sub_pid')
-    return jsonify(web_api.remove_social_media_loc(social_media_id, sub_pid))
+    return jsonify(web_api.remove_social_media_loc(sub_pid))
 
 
 @web_bp.route('/jd_union/get_social_media_loc_list')
 def jd_union_get_social_media_loc_list():
-    from main.services.jd_union.web_api import WebApi
-    web_api = WebApi()
-    social_media_id = request.args.get('social_media_id')
-    page = request.args.get('page', 1)
-    pass
+    page = int(request.args.get('page')) if (
+            (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
+    # TODO：wtforms
+    if request.args.get('social_media_id') is not None:
+        social_media_id = request.args.get('social_media_id')
+        social_media_loc_list = Socialmedia_Loc.objects(mediaId=social_media_id).order_by('createTime').paginate(
+            page=page, per_page=10)
+    else:
+        social_media_loc_list = Socialmedia_Loc.objects().order_by('createTime').paginate(page=page, per_page=10)
+    r = []
+    for social_media_loc in social_media_loc_list.items:
+        new_social_media_loc = {}
+        new_social_media_loc['id'] = int(social_media_loc['id'])
+        new_social_media_loc['promotionName'] = social_media_loc['promotionName']
+        new_social_media_loc['pid'] = social_media_loc['pid']
+        new_social_media_loc['mediaId'] = social_media_loc['mediaId']
+        new_social_media_loc['createTime'] = social_media_loc['createTime']  # .strftime('%Y-%m-%d %H:%M:%S')
+        r.append(new_social_media_loc)
+    next = page + 1 if social_media_loc_list.has_next else page
+    r = {'social_media_loc_list': r, 'next': next, 'pages': social_media_loc_list.pages,
+         'has_next': social_media_loc_list.has_next}
+    return success(r)
 
 
 @web_bp.route('/jd_union/get_social_media_by_args')
