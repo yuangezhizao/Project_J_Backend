@@ -76,8 +76,9 @@ def jd_union_create_social_media_loc():
 def jd_union_remove_social_media_loc():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
+    social_media_id = request.args.get('social_media_id')
     sub_pid = request.args.get('sub_pid')
-    return jsonify(web_api.remove_social_media_loc(sub_pid))
+    return jsonify(web_api.remove_social_media_loc(social_media_id, sub_pid))
 
 
 @web_bp.route('/jd_union/get_social_media_loc_list')
