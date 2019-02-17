@@ -40,12 +40,11 @@ def jd_union_remove_social_media():
     return jsonify(web_api.remove_social_media(social_media_id))
 
 
-@web_bp.route('/jd_union/refresh_social_media_list')
-def jd_union_refresh_social_media_list():
+@web_bp.route('/jd_union/get_social_media_list')
+def jd_union_get_social_media_list():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
-    page = request.args.get('page', 1)
-    return jsonify(web_api.refresh_social_media_list(page))
+    return jsonify(web_api.get_social_media_list())
 
 
 @web_bp.route('/jd_union/create_social_media_loc')

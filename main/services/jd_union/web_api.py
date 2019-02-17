@@ -63,7 +63,7 @@ class WebApi:
             print(str(r))
         return r
 
-    def refresh_social_media_list(self, page=1):
+    def get_social_media_list(self, page=1):  # page 参数无需手动传入
         page = int(page)
         data = {'data': {}, 'pageNo': page, 'pageSize': 50, 'totalCount': 0}
         r = requests.post(self.BASE_URL + self.GET_GUIDE_SOCIAL_LIST_METHOD, data=json.dumps(data),
@@ -83,14 +83,16 @@ class WebApi:
             totalcount = result['page']['totalCount']
             totalpage = int(math.ceil(float(totalcount) / 50.0))
             if page < totalpage:
-                self.refresh_social_media_list(page + 1)
+                self.get_social_media_list(page + 1)
+            return True
         else:
             print(str(r))
             return r
-        result = []
-        for each in self.conn['jdunion_socialmedia'].find():
-            result.append(each)
-        return result
+        # result = []
+        # for each in self.conn['jdunion_socialmedia'].find():
+        #     result.append(each)
+        # return result
+        # 鉴于要加上分页操作，不再此处返回结果
 
     def create_social_media_loc(self, social_media_id, sub_name):
         data = {'data': {'siteId': social_media_id, 'spaceName': sub_name, 'type': '3'}}
