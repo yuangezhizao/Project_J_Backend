@@ -143,7 +143,8 @@ class WebApi:
             result = r['data']
             for each in result['promotionLists']:
                 each['_id'] = each['id']
-                each['social_media'] = social_media_id
+                each.pop('id')
+                each['mediaId'] = social_media_id
                 try:
                     self.conn['jdunion_socialmedia_loc'].insert(each)
                 except Exception as e:
