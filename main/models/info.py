@@ -13,7 +13,7 @@ from main.plugins.extensions import db
 
 class WX_Info(db.Document):
     meta = {
-        'collection': 'projectj_wx_info'
+        'collection': 'projectj_wx_infos'
     }
     title = db.StringField(required=True)  # 标题
     content = db.StringField(required=True)  # 内容
