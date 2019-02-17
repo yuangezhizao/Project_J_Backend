@@ -116,10 +116,16 @@ class WebApi:
         data = {'data': {'siteId': social_media_id, 'spaceName': sub_name, 'type': '3'}}
         r = requests.post(self.BASE_URL + self.SAVE_PROMOTION_SITE_METHOD, data=json.dumps(data),
                           headers=self.headers).json()
+        result = self.get_social_media_loc_list(social_media_id)
+        if isinstance(result, bool):
+            result = 'Update success'
+        else:
+            result = 'Update failed'
         return r
 
-    def remove_social_media_loc(self, sub_pid):
+    def remove_social_media_loc(self, social_media_id, sub_pid):
         # 推广管理 > 推广位管理 > 社交媒体推广位 > 删除社交媒体推广位
+        # 此处 social_media_id 非必需参数，但考虑到刷新机制需在此传入
         sub_pid = int(sub_pid)
         data = {'data': {'id': sub_pid}}
         r = requests.post(self.BASE_URL + self.DEL_PROMOTION_SITE, data=json.dumps(data), headers=self.headers).json()
@@ -128,6 +134,11 @@ class WebApi:
             self.conn['jdunion_socialmedia_loc'].remove({'_id': sub_pid})
         else:
             print(str(r))
+        result = self.get_social_media_loc_list(social_media_id)
+        if isinstance(result, bool):
+            result = 'Update success'
+        else:
+            result = 'Update failed'
         return r
 
     def get_social_media_loc_list(self, social_media_id, page=1):  # page 参数无需手动传入
