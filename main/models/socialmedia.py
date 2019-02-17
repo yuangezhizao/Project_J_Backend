@@ -14,7 +14,6 @@ class Socialmedia(db.Document):
         'collection': 'jdunion_socialmedia'
     }
     id = db.IntField(required=True, primary_key=True)  # 主键即为 _id，社交媒体 ID
-    unionId = db.IntField(required=True)  # 联盟 ID（无用）
     mediaName = db.StringField(required=True)  # 社交媒体名称
     homeUrl = db.StringField(required=True)  # 用户主页地址
     loginAccount = db.StringField(required=True)  # 登录账号

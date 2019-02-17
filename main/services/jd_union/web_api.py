@@ -90,6 +90,7 @@ class WebApi:
             for each in result['unionGuideSocialResList']:
                 each['_id'] = each['id']
                 each.pop('id')
+                each.pop('unionId')
                 each.pop('appKeyKpl')
                 each.pop('appSecretKpl')
                 try:
