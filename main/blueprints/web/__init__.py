@@ -12,3 +12,4 @@ web_bp = Blueprint('web', __name__)
 
 from main.blueprints.web import jd_union
 from main.blueprints.web import wx_feedback
+from main.blueprints.web import wx_user
