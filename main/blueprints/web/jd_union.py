@@ -19,19 +19,19 @@ def jd_union_create_url():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
     # RuntimeError: Working outside of application context.
-    social_media_id = request.args.get('social_media_id')
-    sub_pid = request.args.get('sub_pid')
-    channel_url = request.args.get('channel_url')
+    social_media_id = request.form.get('social_media_id')
+    sub_pid = request.form.get('sub_pid')
+    channel_url = request.form.get('channel_url')
     return jsonify(web_api.create_url(social_media_id, sub_pid, channel_url))
 
 
-@web_bp.route('/jd_union/create_social_media')
+@web_bp.route('/jd_union/create_social_media', methods=['GET', 'POST'])
 def jd_union_create_social_media():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
-    channel_url = request.args.get('channel_url')
-    account = request.args.get('account')
-    social_media_name = request.args.get('social_media_name')
+    channel_url = request.form.get('channel_url')
+    account = request.form.get('account')
+    social_media_name = request.form.get('social_media_name')
     return jsonify(web_api.create_social_media(channel_url, account, social_media_name))
 
 
@@ -39,7 +39,7 @@ def jd_union_create_social_media():
 def jd_union_remove_social_media():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
-    social_media_id = request.args.get('social_media_id')
+    social_media_id = request.form.get('social_media_id')
     return jsonify(web_api.remove_social_media(social_media_id))
 
 
@@ -68,8 +68,8 @@ def jd_union_get_social_media_list():
 def jd_union_create_social_media_loc():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
-    social_media_id = request.args.get('social_media_id')
-    sub_name = request.args.get('sub_name')
+    social_media_id = request.form.get('social_media_id')
+    sub_name = request.form.get('sub_name')
     return jsonify(web_api.create_social_media_loc(social_media_id, sub_name))
 
 
@@ -77,7 +77,7 @@ def jd_union_create_social_media_loc():
 def jd_union_remove_social_media_loc():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
-    sub_pid = request.args.get('sub_pid')
+    sub_pid = request.form.get('sub_pid')
     return jsonify(web_api.remove_social_media_loc(sub_pid))
 
 
