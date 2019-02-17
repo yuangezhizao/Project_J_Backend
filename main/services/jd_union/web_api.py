@@ -130,7 +130,7 @@ class WebApi:
             print(str(r))
         return r
 
-    def get_social_media_loc_list(self, social_media_id, page=1):
+    def get_social_media_loc_list(self, social_media_id, page=1):  # page 参数无需手动传入
         # 推广管理 > 推广位管理 > 社交媒体推广位
         social_media_id = int(social_media_id)
         page = int(page)
