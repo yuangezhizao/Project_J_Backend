@@ -127,7 +127,7 @@ class WebApi:
             print(str(r))
         return r
 
-    def refresh_social_media_loc_list(self, social_media_id, page=1):
+    def get_social_media_loc_list(self, social_media_id, page=1):
         social_media_id = int(social_media_id)
         page = int(page)
         data = {'data': {'id': social_media_id, 'opType': 2, 'promotionType': '3'}, 'pageNo': page, 'pageSize': 50,
@@ -147,14 +147,16 @@ class WebApi:
             totalcount = result['page']['totalCount']
             totalpage = int(math.ceil(float(totalcount) / 50.0))
             if page < totalpage:
-                self.refresh_social_media_loc_list(page + 1)
+                self.get_social_media_loc_list(social_media_id, page + 1)
+            return True
         else:
             print(str(r))
             return r
-        result = []
-        for each in self.conn['jdunion_socialmedia_loc'].find():
-            result.append(each)
-        return result
+        # result = []
+        # for each in self.conn['jdunion_socialmedia_loc'].find():
+        #     result.append(each)
+        # return result
+        # 鉴于要加上分页操作，不再此处返回结果
 
     def get_social_media_by_args(self, social_media_id='', social_media_name='', channel_url='', account=''):
         args = {}

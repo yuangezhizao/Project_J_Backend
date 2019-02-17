@@ -80,13 +80,13 @@ def jd_union_remove_social_media_loc():
     return jsonify(web_api.remove_social_media_loc(sub_pid))
 
 
-@web_bp.route('/jd_union/refresh_social_media_loc_list')
-def jd_union_refresh_social_media_loc_list():
+@web_bp.route('/jd_union/get_social_media_loc_list')
+def jd_union_get_social_media_loc_list():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
     social_media_id = request.args.get('social_media_id')
     page = request.args.get('page', 1)
-    return jsonify(web_api.refresh_social_media_loc_list(social_media_id, page))
+    pass
 
 
 @web_bp.route('/jd_union/get_social_media_by_args')
