@@ -73,6 +73,9 @@ class WebApi:
             result = r['data']
             for each in result['unionGuideSocialResList']:
                 each['_id'] = each['id']
+                each.pop('id')
+                each.pop('appKeyKpl')
+                each.pop('appSecretKpl')
                 try:
                     self.conn['jdunion_socialmedia'].insert(each)
                 except Exception as e:
