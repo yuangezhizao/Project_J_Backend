@@ -47,6 +47,10 @@ class WebApi:
             return r
 
     def create_social_media(self, channel_url, account, social_media_name):
+        # 推广管理 > 社交媒体管理 > 添加社交媒体
+        # 用户主页地址
+        # 登录帐号
+        # 媒体名称
         data = {'data': {'homeUrl': channel_url, 'loginAccount': account, 'mediaName': social_media_name}}
         r = requests.post(self.BASE_URL + self.SAVE_GUIDE_SOCIAL_METHOD, data=json.dumps(data),
                           headers=self.headers).json()
@@ -58,6 +62,7 @@ class WebApi:
         return r
 
     def remove_social_media(self, social_media_id):
+        # 推广管理 > 社交媒体管理 > 删除社交媒体
         social_media_id = int(social_media_id)
         data = {'data': {'id': social_media_id}}
         r = requests.post(self.BASE_URL + self.REMOVE_GUIDE_SOCIAL_METHOD, data=json.dumps(data),
@@ -74,6 +79,7 @@ class WebApi:
         return r
 
     def get_social_media_list(self, page=1):  # page 参数无需手动传入
+        # 推广管理 > 社交媒体管理
         page = int(page)
         data = {'data': {}, 'pageNo': page, 'pageSize': 50, 'totalCount': 0}
         r = requests.post(self.BASE_URL + self.GET_GUIDE_SOCIAL_LIST_METHOD, data=json.dumps(data),
