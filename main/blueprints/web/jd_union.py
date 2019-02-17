@@ -14,7 +14,7 @@ from main.models.socialmedia_loc import Socialmedia_Loc
 from . import web_bp
 
 
-@web_bp.route('/jd_union/create_url')
+@web_bp.route('/jd_union/create_url', methods=['GET', 'POST'])
 def jd_union_create_url():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
@@ -35,7 +35,7 @@ def jd_union_create_social_media():
     return jsonify(web_api.create_social_media(channel_url, account, social_media_name))
 
 
-@web_bp.route('/jd_union/remove_social_media')
+@web_bp.route('/jd_union/remove_social_media', methods=['GET', 'POST'])
 def jd_union_remove_social_media():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
@@ -64,7 +64,7 @@ def jd_union_get_social_media_list():
     return success(r)
 
 
-@web_bp.route('/jd_union/create_social_media_loc')
+@web_bp.route('/jd_union/create_social_media_loc', methods=['GET', 'POST'])
 def jd_union_create_social_media_loc():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
@@ -73,7 +73,7 @@ def jd_union_create_social_media_loc():
     return jsonify(web_api.create_social_media_loc(social_media_id, sub_name))
 
 
-@web_bp.route('/jd_union/remove_social_media_loc')
+@web_bp.route('/jd_union/remove_social_media_loc', methods=['GET', 'POST'])
 def jd_union_remove_social_media_loc():
     from main.services.jd_union.web_api import WebApi
     web_api = WebApi()
