@@ -111,12 +111,15 @@ class WebApi:
         # 鉴于要加上分页操作，不再此处返回结果
 
     def create_social_media_loc(self, social_media_id, sub_name):
+        # 推广管理 > 推广位管理 > 社交媒体推广位 > 创建推广位
+        # 推广位名称
         data = {'data': {'siteId': social_media_id, 'spaceName': sub_name, 'type': '3'}}
         r = requests.post(self.BASE_URL + self.SAVE_PROMOTION_SITE_METHOD, data=json.dumps(data),
                           headers=self.headers).json()
         return r
 
     def remove_social_media_loc(self, sub_pid):
+        # 推广管理 > 推广位管理 > 社交媒体推广位 > 删除社交媒体推广位
         sub_pid = int(sub_pid)
         data = {'data': {'id': sub_pid}}
         r = requests.post(self.BASE_URL + self.DEL_PROMOTION_SITE, data=json.dumps(data), headers=self.headers).json()
@@ -128,6 +131,7 @@ class WebApi:
         return r
 
     def get_social_media_loc_list(self, social_media_id, page=1):
+        # 推广管理 > 推广位管理 > 社交媒体推广位
         social_media_id = int(social_media_id)
         page = int(page)
         data = {'data': {'id': social_media_id, 'opType': 2, 'promotionType': '3'}, 'pageNo': page, 'pageSize': 50,
