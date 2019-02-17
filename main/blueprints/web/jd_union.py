@@ -8,6 +8,8 @@
 """
 from flask import request, jsonify
 
+from main.apis.v0_1.outputs import success
+from main.models.socialmedia import Socialmedia
 from . import web_bp
 
 
@@ -42,9 +44,23 @@ def jd_union_remove_social_media():
 
 @web_bp.route('/jd_union/get_social_media_list')
 def jd_union_get_social_media_list():
-    from main.services.jd_union.web_api import WebApi
-    web_api = WebApi()
-    return jsonify(web_api.get_social_media_list())
+    page = int(request.args.get('page')) if (
+            (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
+    # TODO：wtforms
+    social_media_list = Socialmedia.objects().order_by('createTime').paginate(page=page, per_page=10)
+    r = []
+    for social_media in social_media_list.items:
+        new_social_media = {}
+        new_social_media['id'] = int(social_media['id'])
+        new_social_media['mediaName'] = social_media['mediaName']
+        new_social_media['homeUrl'] = social_media['homeUrl']
+        new_social_media['loginAccount'] = social_media['loginAccount']
+        new_social_media['createTime'] = social_media['createTime']  # .strftime('%Y-%m-%d %H:%M:%S')
+        new_social_media['updateTime'] = social_media['updateTime']  # .strftime('%Y-%m-%d %H:%M:%S')
+        r.append(new_social_media)
+    next = page + 1 if social_media_list.has_next else page
+    r = {'social_media_list': r, 'next': next, 'pages': social_media_list.pages, 'has_next': social_media_list.has_next}
+    return success(r)
 
 
 @web_bp.route('/jd_union/create_social_media_loc')
