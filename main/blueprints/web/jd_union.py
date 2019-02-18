@@ -89,18 +89,22 @@ def jd_union_get_social_media_loc_list():
     if request.args.get('social_media_id') is not None:
         social_media_id = request.args.get('social_media_id')
         social_media_loc_list = Socialmedia_Loc.objects(mediaId=social_media_id).order_by('createTime').paginate(
-            page=page, per_page=10)
+            page=page, per_page=50)
     else:
-        social_media_loc_list = Socialmedia_Loc.objects().order_by('createTime').paginate(page=page, per_page=10)
-    r = []
+        social_media_loc_list = Socialmedia_Loc.objects().order_by('createTime').paginate(page=page, per_page=50)
+    r = {}
     for social_media_loc in social_media_loc_list.items:
         new_social_media_loc = {}
         new_social_media_loc['id'] = int(social_media_loc['id'])
         new_social_media_loc['promotionName'] = social_media_loc['promotionName']
         new_social_media_loc['pid'] = social_media_loc['pid']
         new_social_media_loc['mediaId'] = social_media_loc['mediaId']
+        new_social_media_loc['mediaName'] = Socialmedia.objects(id=social_media_loc['mediaId']).first().mediaName
         new_social_media_loc['createTime'] = social_media_loc['createTime']  # .strftime('%Y-%m-%d %H:%M:%S')
-        r.append(new_social_media_loc)
+        if not r.get(social_media_loc['mediaId']):
+            r[social_media_loc['mediaId']] = [new_social_media_loc, ]
+        else:
+            r[social_media_loc['mediaId']].append(new_social_media_loc)
     next = page + 1 if social_media_loc_list.has_next else page
     r = {'social_media_loc_list': r, 'next': next, 'pages': social_media_loc_list.pages,
          'has_next': social_media_loc_list.has_next}
