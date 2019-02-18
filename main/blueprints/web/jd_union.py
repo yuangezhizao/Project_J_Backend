@@ -88,10 +88,10 @@ def jd_union_get_social_media_loc_list():
     # TODO：wtforms
     if request.args.get('social_media_id') is not None:
         social_media_id = request.args.get('social_media_id')
-        social_media_loc_list = Socialmedia_Loc.objects(mediaId=social_media_id).order_by('+createTime').paginate(
+        social_media_loc_list = Socialmedia_Loc.objects(mediaId=social_media_id).order_by('createTime').paginate(
             page=page, per_page=50)
     else:
-        social_media_loc_list = Socialmedia_Loc.objects().order_by('+createTime').paginate(page=page, per_page=50)
+        social_media_loc_list = Socialmedia_Loc.objects().order_by('createTime').paginate(page=page, per_page=50)
     r = {}
     for social_media_loc in social_media_loc_list.items:
         new_social_media_loc = {}
