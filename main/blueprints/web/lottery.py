@@ -31,7 +31,7 @@ def lottery_index():
         new_lottery = {}
         new_lottery['lotteryCode'] = lottery['lotteryCode']
         new_lottery['lotteryName'] = lottery['lotteryName']
-        new_lottery['beginTime'] = lottery['beginTime']
+        new_lottery['beginTime'] = lottery['beginTime'].strftime('%Y-%m-%d %H:%M:%S')
         new_lottery['endTime'] = lottery['endTime'].strftime('%Y-%m-%d %H:%M:%S')
         r.append(new_lottery)
     next = page + 1 if paginated_lotteries.has_next else page
