@@ -108,3 +108,18 @@ def lottery_unlock():
         'unlock_Time': check_result,
     }
     return success(r)
+
+
+@api_v0_1.route('/lottery/search', methods=['GET', 'POST'])
+@auth_required
+def lottery_search():
+    # TODO：等学会 ES 的
+    try:
+        content = request.get_json()['content']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    r = {
+        'content': content,
+    }
+    return success(r)
