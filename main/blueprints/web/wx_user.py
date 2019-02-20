@@ -8,7 +8,7 @@
 """
 from flask import request
 
-from main.apis.v0_1.outputs import success
+from main.apis.v0_1.outputs import success, bad_request
 from . import web_bp
 
 
@@ -29,4 +29,18 @@ def wx_user_index():
         r.append(new_user)
     next = page + 1 if paginated_users.has_next else page
     r = {'users': r, 'next': next, 'pages': paginated_users.pages, 'has_next': paginated_users.has_next}
+    return success(r)
+
+
+@web_bp.route('/wx/user/search', methods=['GET', 'POST'])
+def wx_user_search():
+    # TODO：等学会 ES 的
+    try:
+        content = request.form['content']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    r = {
+        'content': content,
+    }
     return success(r)
