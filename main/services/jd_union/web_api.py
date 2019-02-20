@@ -121,6 +121,7 @@ class WebApi:
 
     def remove_social_media_loc(self, sub_pid):
         # 推广管理 > 推广位管理 > 社交媒体推广位 > 删除社交媒体推广位
+        # TODO：sub_pid？
         sub_pid = int(sub_pid)
         data = {'data': {'id': sub_pid}}
         r = requests.post(self.BASE_URL + self.DEL_PROMOTION_SITE, data=json.dumps(data), headers=self.headers).json()
