@@ -8,7 +8,7 @@
 """
 from flask import request
 
-from main.apis.v0_1.outputs import success
+from main.apis.v0_1.outputs import success, bad_request
 from main.models.good import Good
 from . import web_bp
 
@@ -28,4 +28,18 @@ def good_index():
         r.append(new_good)
     next = page + 1 if paginated_goods.has_next else page
     r = {'goods': r, 'next': next, 'pages': paginated_goods.pages, 'has_next': paginated_goods.has_next}
+    return success(r)
+
+
+@web_bp.route('/good/search', methods=['GET', 'POST'])
+def good_search():
+    # TODO：等学会 ES 的
+    try:
+        content = request.form['content']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    r = {
+        'content': content,
+    }
     return success(r)
