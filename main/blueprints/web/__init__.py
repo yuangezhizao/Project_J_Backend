@@ -14,3 +14,4 @@ from main.blueprints.web import jd_union
 from main.blueprints.web import wx_feedback
 from main.blueprints.web import wx_user
 from main.blueprints.web import lottery
+from main.blueprints.web import goods
