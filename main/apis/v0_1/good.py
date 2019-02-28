@@ -24,7 +24,9 @@ def good_index():
         new_good = {}
         new_good['sku'] = good['sku']
         new_good['title'] = good['title']
-        new_good['prize'] = good['prize']
+        new_good['prize'] = good['price_now']
+        new_good['url'] = good['url']
+        new_good['img'] = good['img']
         r.append(new_good)
     next = page + 1 if paginated_goods.has_next else page
     r = {'goods': r, 'next': next, 'pages': paginated_goods.pages, 'has_next': paginated_goods.has_next}
@@ -45,6 +47,8 @@ def good_detail():
     r = {
         'sku': good.sku,
         'title': good.title.strip(),
-        'prize': good.prize,
+        'prize': good.price_now,
+        'url': good.url,
+        'img': good.img
     }
     return success(r)
