@@ -13,4 +13,4 @@ web_bp = Blueprint('web', __name__)
 
 CORS(web_bp)
 
-from . import jd_union, wx_feedback, wx_user, lottery, goods
+from . import jd_union, wx_feedback, wx_user, lottery, good
