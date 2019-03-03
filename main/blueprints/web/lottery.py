@@ -20,7 +20,7 @@ def lottery_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     # TODO：wtforms
-    has_expired = request.args.get('has_expired')
+    has_expired = request.args.get('has_expired', 0)
     if int(has_expired) == 1:
         paginated_lotteries = Lottery.objects().order_by('endTime').paginate(page=page, per_page=10)
     else:
