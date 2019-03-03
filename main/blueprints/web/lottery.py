@@ -21,11 +21,16 @@ def lottery_index():
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     # TODO：wtforms
     has_expired = request.args.get('has_expired', 0)
+    sort = request.args.get('sort', 0)
+    if sort == 1:
+        sort = '-endTime'
+    else:
+        sort = 'endTime'
     if int(has_expired) == 1:
-        paginated_lotteries = Lottery.objects().order_by('endTime').paginate(page=page, per_page=10)
+        paginated_lotteries = Lottery.objects().order_by(sort).paginate(page=page, per_page=10)
     else:
         now_time = datetime.datetime.now()
-        paginated_lotteries = Lottery.objects(endTime__gt=now_time).order_by('endTime').paginate(page=page, per_page=10)
+        paginated_lotteries = Lottery.objects(endTime__gt=now_time).order_by(sort).paginate(page=page, per_page=10)
     r = []
     for lottery in paginated_lotteries.items:
         new_lottery = {}

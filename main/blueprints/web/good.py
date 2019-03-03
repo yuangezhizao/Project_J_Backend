@@ -17,7 +17,11 @@ from . import web_bp
 def good_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
-    paginated_goods = Good.objects.order_by('-update_time').paginate(page=page, per_page=10)
+    sort = request.args.get('sort', 0)
+    if sort == 1:
+        paginated_goods = Good.objects.order_by('update_time').paginate(page=page, per_page=10)
+    else:
+        paginated_goods = Good.objects.order_by('-update_time').paginate(page=page, per_page=10)
     r = []
     for good in paginated_goods.items:
         new_good = {}
