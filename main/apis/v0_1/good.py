@@ -18,7 +18,7 @@ from main.models.good import Good
 @auth_required
 def good_index():
     page = request.get_json()['page'] if ((request.get_json() is not None) and ('page' in request.get_json())) else 1
-    paginated_goods = Good.objects.paginate(page=page, per_page=10)
+    paginated_goods = Good.objects.order_by('-update_time').paginate(page=page, per_page=10)
     r = []
     for good in paginated_goods.items:
         new_good = {}
@@ -46,9 +46,17 @@ def good_detail():
         return not_found('商品码无效')
     r = {
         'sku': good.sku,
+        'price_now': good.price_now,
+        'img': good.img,
         'title': good.title.strip(),
-        'prize': good.price_now,
         'url': good.url,
-        'img': good.img
+        'discountpercent': ('%.2f' % good.discountpercent),
+        'jd_price': good.jd_price,
+        'buy_count': good.buy_count,
+        'his_price': good.his_price,
+        'cuxiao': good.cuxiao,
+        'coupon_discount': good.coupon_discount,
+        'coupon_quota': good.coupon_quota,
+        'coupon_url': good.coupon_url
     }
     return success(r)
