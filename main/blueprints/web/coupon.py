@@ -29,7 +29,7 @@ def coupon_index():
         new_coupon['key'] = coupon['key']
         new_coupon['from_title'] = coupon['from_title'].strip()
         new_coupon['update_time'] = coupon['update_time'].strftime('%Y-%m-%d %H:%M:%S')
-        new_coupon['from'] = coupon['from']
+        new_coupon['from_url'] = coupon['from_url']
 
         new_coupon['limitStr'] = coupon['limitStr'] if 'limitStr' in coupon else ''
         new_coupon['quota'] = coupon['quota'] if 'quota' in coupon else ''
