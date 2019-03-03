@@ -22,7 +22,7 @@ def lottery_index():
     # TODO：wtforms
     has_expired = request.args.get('has_expired', 0)
     sort = request.args.get('sort', 0)
-    if sort == 1:
+    if int(sort) == 1:
         sort = '-endTime'
     else:
         sort = 'endTime'
