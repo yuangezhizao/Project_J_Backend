@@ -15,7 +15,8 @@ from . import web_bp
 
 @web_bp.route('/good', methods=['GET', 'POST'])
 def good_index():
-    page = request.get_json()['page'] if ((request.get_json() is not None) and ('page' in request.get_json())) else 1
+    page = int(request.args.get('page')) if (
+            (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     paginated_goods = Good.objects.order_by('-update_time').paginate(page=page, per_page=10)
     r = []
     for good in paginated_goods.items:
