@@ -14,13 +14,13 @@ class Coupon_Orig(db.Document):
         'collection': 'projectj_coupons'
     }
     key = db.StringField(required=True, primary_key=True)  # 主键即为 _id，优惠券 key
-    endTime = db.DateTimeField()
-    limitStr = db.StringField()
-    discountpercent = db.FloatField()
     roleid = db.StringField()
+    limitStr = db.StringField()
     quota = db.StringField()
-    batchId = db.StringField()
     discount = db.StringField()
-    beginTime = db.DateTimeField()
+    discountpercent = db.FloatField()
+    batchId = db.StringField()
     batchCount = db.IntField()
+    beginTime = db.DateTimeField()
+    endTime = db.DateTimeField()
     update_time = db.DateTimeField()
