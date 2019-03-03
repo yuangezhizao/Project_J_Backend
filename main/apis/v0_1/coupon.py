@@ -18,13 +18,14 @@ from main.models.coupon import Coupon
 @auth_required
 def coupon_index():
     page = request.get_json()['page'] if ((request.get_json() is not None) and ('page' in request.get_json())) else 1
-    paginated_coupons = Coupon.objects.paginate(page=page, per_page=10)
+    paginated_coupons = Coupon.objects.order_by('-update_time').paginate(page=page, per_page=10)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}
         new_coupon['key'] = coupon['key']
-        new_coupon['name'] = coupon['name']
-        new_coupon['strength'] = coupon['strength']
+        new_coupon['limitStr'] = coupon['limitStr']
+        new_coupon['quota'] = coupon['quota']
+        new_coupon['discount'] = coupon['discount']
         r.append(new_coupon)
     next = page + 1 if paginated_coupons.has_next else page
     r = {'coupons': r, 'next': next, 'pages': paginated_coupons.pages, 'has_next': paginated_coupons.has_next}
@@ -48,11 +49,13 @@ def coupon_detail():
         status = 0  # 已经解锁
     r = {
         'key': coupon.key,
-        'name': coupon.name,
-        'strength': coupon.strength,
+        'limitStr': coupon.limitStr,
+        'quota': coupon.quota,
+        'discount': coupon.discount,
+        'discountpercent': coupon.discountpercent,
+        'batchCount': coupon.batchCount,
         'beginTime': coupon.beginTime,
         'endTime': coupon.endTime,
-        # 'act_url': coupon.act_url,
         # 'url': coupon.url
         # 注释为解锁字段
         'sellingpoints': 1,
@@ -86,10 +89,7 @@ def coupon_unlock():
         else:
             return result
     r = {
-        'act_url': coupon.act_url,
         'url': coupon.url,
-        'beginTime': coupon.beginTime,
-        'endTime': coupon.endTime,
         'points': g.user.points,
         'status': status,
         'unlock_Time': check_result,
