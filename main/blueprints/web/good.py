@@ -19,9 +19,10 @@ def good_index():
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     sort = request.args.get('sort', 0)
     if int(sort) == 1:
-        paginated_goods = Good.objects.order_by('update_time').paginate(page=page, per_page=10)
+        sort = 'update_time'
     else:
-        paginated_goods = Good.objects.order_by('-update_time').paginate(page=page, per_page=10)
+        sort = '-update_time'
+    paginated_goods = Good.objects.order_by(sort).paginate(page=page, per_page=10)
     r = []
     for good in paginated_goods.items:
         new_good = {}

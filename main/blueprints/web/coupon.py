@@ -20,8 +20,13 @@ from . import web_bp
 def coupon_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
-    paginated_coupons = Coupon_Orig.objects(limitStr__exists=True).order_by('-update_time').paginate(page=page,
-                                                                                                     per_page=10)
+    sort = request.args.get('sort', 0)
+    if int(sort) == 1:
+        sort = 'update_time'
+    else:
+        sort = '-update_time'
+    paginated_coupons = Coupon_Orig.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
+                                                                                           per_page=10)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}
@@ -50,7 +55,13 @@ def coupon_index():
 def coupon_show_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
-    paginated_coupons = Coupon.objects().order_by('-update_time').paginate(page=page, per_page=10)
+    sort = request.args.get('sort', 0)
+    if int(sort) == 1:
+        sort = 'update_time'
+    else:
+        sort = '-update_time'
+    paginated_coupons = Coupon_Orig.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
+                                                                                           per_page=10)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}
