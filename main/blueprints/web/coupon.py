@@ -46,6 +46,34 @@ def coupon_index():
     return success(r)
 
 
+@web_bp.route('/coupon_show', methods=['GET', 'POST'])
+def coupon_show_index():
+    page = int(request.args.get('page')) if (
+            (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
+    paginated_coupons = Coupon.objects().order_by('-update_time').paginate(page=page, per_page=10)
+    r = []
+    for coupon in paginated_coupons.items:
+        new_coupon = {}
+        new_coupon['key'] = coupon['key']
+        new_coupon['limitStr'] = coupon['limitStr']
+        new_coupon['discount'] = coupon['discount']
+        new_coupon['discountpercent'] = coupon['discountpercent']
+        new_coupon['batchId'] = coupon['batchId']
+        new_coupon['batchCount'] = coupon['batchCount']
+        new_coupon['beginTime'] = coupon['beginTime'].strftime('%Y-%m-%d %H:%M:%S')
+        new_coupon['endTime'] = coupon['endTime'].strftime('%Y-%m-%d %H:%M:%S')
+        new_coupon['update_time'] = coupon['update_time'].strftime('%Y-%m-%d %H:%M:%S')
+        new_coupon['coupon_name'] = '满 {0} 减 {1}'.format(coupon['quota'], coupon['discount'])
+        new_coupon['url'] = coupon['url']
+        new_coupon['salesurl'] = coupon['salesurl']
+        new_coupon['batchurl'] = coupon['batchurl']
+        new_coupon['from_url'] = coupon['from_url']
+        r.append(new_coupon)
+    next = page + 1 if paginated_coupons.has_next else page
+    r = {'coupons': r, 'next': next, 'pages': paginated_coupons.pages, 'has_next': paginated_coupons.has_next}
+    return success(r)
+
+
 @web_bp.route('/coupon/show', methods=['GET', 'POST'])
 def coupon_show():
     try:
