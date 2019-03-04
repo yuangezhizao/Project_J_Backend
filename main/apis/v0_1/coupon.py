@@ -52,8 +52,8 @@ def coupon_detail():
         'coupon_name': '满 {0} 减 {1}'.format(coupon['quota'], coupon['discount']),
         'discountpercent': coupon.discountpercent,
         'batchCount': coupon.batchCount,
-        'beginTime': coupon.beginTime,
-        'endTime': coupon.endTime,
+        'beginTime': coupon.beginTime.strftime('%Y-%m-%d %H:%M:%S'),
+        'endTime': coupon.endTime.strftime('%Y-%m-%d %H:%M:%S'),
         # 'url': coupon.url
         # 注释为解锁字段
         'sellingpoints': 1,
