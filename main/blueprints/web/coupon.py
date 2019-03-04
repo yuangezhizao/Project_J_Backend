@@ -60,7 +60,7 @@ def coupon_show_index():
         sort = 'update_time'
     else:
         sort = '-update_time'
-    paginated_coupons = Coupon_Orig.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
+    paginated_coupons = Coupon.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
                                                                                            per_page=10)
     r = []
     for coupon in paginated_coupons.items:
