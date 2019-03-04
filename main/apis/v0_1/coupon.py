@@ -24,8 +24,7 @@ def coupon_index():
         new_coupon = {}
         new_coupon['key'] = coupon['key']
         new_coupon['limitStr'] = coupon['limitStr']
-        new_coupon['quota'] = coupon['quota']
-        new_coupon['discount'] = coupon['discount']
+        new_coupon['coupon_name'] = '满 {0} 减 {1}'.format(coupon['quota'], coupon['discount'])
         r.append(new_coupon)
     next = page + 1 if paginated_coupons.has_next else page
     r = {'coupons': r, 'next': next, 'pages': paginated_coupons.pages, 'has_next': paginated_coupons.has_next}
@@ -50,8 +49,7 @@ def coupon_detail():
     r = {
         'key': coupon.key,
         'limitStr': coupon.limitStr,
-        'quota': coupon.quota,
-        'discount': coupon.discount,
+        'coupon_name': '满 {0} 减 {1}'.format(coupon['quota'], coupon['discount']),
         'discountpercent': coupon.discountpercent,
         'batchCount': coupon.batchCount,
         'beginTime': coupon.beginTime,
@@ -90,6 +88,9 @@ def coupon_unlock():
             return result
     r = {
         'url': coupon.url,
+        'salesurl': coupon.salesurl,
+        'batchurl': coupon.batchurl,
+        'from_url': coupon.from_url,
         'points': g.user.points,
         'status': status,
         'unlock_Time': check_result,
