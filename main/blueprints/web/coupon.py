@@ -21,8 +21,10 @@ def coupon_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     sort = request.args.get('sort', 0)
-    if int(sort) == 1:
+    if sort == 'update_time':
         sort = 'update_time'
+    elif sort == 'discountpercent':
+        sort = 'discountpercent'
     else:
         sort = '-update_time'
     paginated_coupons = Coupon_Orig.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
@@ -56,8 +58,10 @@ def coupon_show_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     sort = request.args.get('sort', 0)
-    if int(sort) == 1:
+    if sort == 'update_time':
         sort = 'update_time'
+    elif sort == 'discountpercent':
+        sort = 'discountpercent'
     else:
         sort = '-update_time'
     paginated_coupons = Coupon.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
