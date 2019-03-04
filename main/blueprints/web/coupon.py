@@ -21,14 +21,17 @@ def coupon_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     sort = request.args.get('sort', 0)
+    filter = request.args.get('filter', 0)
     if sort == 'update_time':
         sort = 'update_time'
     elif sort == 'discountpercent':
         sort = 'discountpercent'
     else:
         sort = '-update_time'
-    paginated_coupons = Coupon_Orig.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
-                                                                                           per_page=10)
+    if filter == 'limitStr':
+        paginated_coupons = Coupon_Orig.objects.filter(limitStr__startswith='仅可购买').order_by(sort).paginate(page=page, per_page=10)
+    else:
+        paginated_coupons = Coupon_Orig.objects().order_by(sort).paginate(page=page, per_page=10)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}
@@ -58,14 +61,17 @@ def coupon_show_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     sort = request.args.get('sort', 0)
+    filter = request.args.get('filter', 0)
     if sort == 'update_time':
         sort = 'update_time'
     elif sort == 'discountpercent':
         sort = 'discountpercent'
     else:
         sort = '-update_time'
-    paginated_coupons = Coupon.objects(limitStr__exists=True).order_by(sort).paginate(page=page,
-                                                                                           per_page=10)
+    if filter == 'limitStr':
+        paginated_coupons = Coupon.objects(limitStr__startswith='仅可购买').order_by(sort).paginate(page=page, per_page=10)
+    else:
+        paginated_coupons = Coupon.objects().order_by(sort).paginate(page=page, per_page=10)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}
