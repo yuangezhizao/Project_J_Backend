@@ -25,3 +25,6 @@ class Coupon(db.Document):
     endTime = db.DateTimeField()
     update_time = db.DateTimeField()
     url = db.StringField()
+    salesurl = db.StringField()
+    batchurl = db.StringField()
+    from_url = db.StringField()
