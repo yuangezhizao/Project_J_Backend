@@ -23,4 +23,4 @@ def short_url_index():
     short_url = Short_URL.objects(id=id).first()
     if short_url is None:
         return not_found('键无效')
-    return redirect(short_url.short_url)
+    return redirect(short_url.url)
