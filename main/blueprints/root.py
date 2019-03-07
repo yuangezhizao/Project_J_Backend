@@ -8,9 +8,12 @@
 """
 from flask import Blueprint
 
+from main.models.site_index_notice import Site_Index_Notice
+
 root_bp = Blueprint('root', __name__)
 
 
 @root_bp.route('/')
 def hello_world():
-    return 'Hello, Flask!'
+    notice = Site_Index_Notice.objects.first()
+    return '<html><body><h1>{0}</h1><h2>{1}</h2></body></html>'.format(notice['title'], notice['content'])
