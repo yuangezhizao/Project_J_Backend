@@ -27,10 +27,10 @@ def lottery_index():
     else:
         sort = 'endTime'
     if int(has_expired) == 1:
-        paginated_lotteries = Lottery.objects().order_by(sort).paginate(page=page, per_page=10)
+        paginated_lotteries = Lottery.objects().order_by(sort).paginate(page=page, per_page=100)
     else:
         now_time = datetime.datetime.now()
-        paginated_lotteries = Lottery.objects(endTime__gt=now_time).order_by(sort).paginate(page=page, per_page=10)
+        paginated_lotteries = Lottery.objects(endTime__gt=now_time).order_by(sort).paginate(page=page, per_page=100)
     r = []
     for lottery in paginated_lotteries.items:
         new_lottery = {}

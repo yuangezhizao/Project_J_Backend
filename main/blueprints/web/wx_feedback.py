@@ -19,7 +19,7 @@ def wx_feedback_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     # TODO：wtforms
-    paginated_feedbacks = WX_Feedback.objects().order_by('insert_time').paginate(page=page, per_page=10)
+    paginated_feedbacks = WX_Feedback.objects().order_by('insert_time').paginate(page=page, per_page=100)
     r = []
     for feedback in paginated_feedbacks.items:
         new_feedback = {}

@@ -29,9 +29,9 @@ def coupon_index():
     else:
         sort = '-update_time'
     if filter == 'limitStr':
-        paginated_coupons = Coupon_Orig.objects.filter(limitStr__startswith='仅可购买').order_by(sort).paginate(page=page, per_page=10)
+        paginated_coupons = Coupon_Orig.objects.filter(limitStr__startswith='仅可购买').order_by(sort).paginate(page=page, per_page=100)
     else:
-        paginated_coupons = Coupon_Orig.objects().order_by(sort).paginate(page=page, per_page=10)
+        paginated_coupons = Coupon_Orig.objects().order_by(sort).paginate(page=page, per_page=100)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}
@@ -69,9 +69,9 @@ def coupon_show_index():
     else:
         sort = '-update_time'
     if filter == 'limitStr':
-        paginated_coupons = Coupon.objects(limitStr__startswith='仅可购买').order_by(sort).paginate(page=page, per_page=10)
+        paginated_coupons = Coupon.objects(limitStr__startswith='仅可购买').order_by(sort).paginate(page=page, per_page=100)
     else:
-        paginated_coupons = Coupon.objects().order_by(sort).paginate(page=page, per_page=10)
+        paginated_coupons = Coupon.objects().order_by(sort).paginate(page=page, per_page=100)
     r = []
     for coupon in paginated_coupons.items:
         new_coupon = {}

@@ -22,7 +22,7 @@ def good_index():
         sort = 'update_time'
     else:
         sort = '-update_time'
-    paginated_goods = Good.objects.order_by(sort).paginate(page=page, per_page=10)
+    paginated_goods = Good.objects.order_by(sort).paginate(page=page, per_page=100)
     r = []
     for good in paginated_goods.items:
         new_good = {}

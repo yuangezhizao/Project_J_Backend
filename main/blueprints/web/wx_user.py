@@ -18,7 +18,7 @@ def wx_user_index():
     page = int(request.args.get('page')) if (
             (request.args.get('page') is not None) and (request.args.get('page') != '')) else 1
     # TODO：wtforms
-    paginated_users = WX_User.objects().order_by('member_since').paginate(page=page, per_page=10)
+    paginated_users = WX_User.objects().order_by('member_since').paginate(page=page, per_page=100)
     r = []
     for user in paginated_users.items:
         new_user = {}
