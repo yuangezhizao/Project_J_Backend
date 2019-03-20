@@ -14,13 +14,8 @@ from main.models.short_url import Short_URL
 root_bp = Blueprint('root', __name__)
 
 
-@root_bp.route('/')
-def hello_world():
-    try:
-        id = request.args.get('id')
-    except Exception as e:
-        print(e)
-        return bad_request('参数错误')
+@root_bp.route('/<id>')
+def hello_world(id):
     short_url = Short_URL.objects(id=id).first()
     if short_url is None:
         return not_found('键无效')
