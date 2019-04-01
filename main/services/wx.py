@@ -12,7 +12,7 @@ from wxpy import Bot
 
 
 def get_bot():
-    bot = Bot('bot.pkl', qr_path='wx.png', console_qr=None)
+    bot = Bot('bot.pkl', qr_path='wx.png')
     bot.enable_puid()
     bot.messages.max_history = 0
     return bot
