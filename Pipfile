@@ -1,12 +1,12 @@
 [[source]]
-
-url = "https://pypi.python.org/simple"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 verify_ssl = true
 name = "pypi"
 
+[requires]
+python_version = "3.7"
 
 [packages]
-
 flask = "*"
 flask-cors = "*"
 flask-mongoengine = "*"
@@ -14,12 +14,9 @@ python-dotenv = "*"
 requests = "*"
 flask-script = "*"
 raven = {extras = ["flask"]}
-
+wxpy = "*"
+itchat = "*"
+elasticsearch = "*"
+elasticsearch-dsl = "<6.0.0,>=5.0.0"
 
 [dev-packages]
-
-
-
-[requires]
-
-python_version = "3.7"
