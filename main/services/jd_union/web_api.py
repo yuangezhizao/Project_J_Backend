@@ -31,6 +31,7 @@ class WebApi:
         self.conn = pymongo.MongoClient(current_app.config['MONGODB_SETTINGS']['host'])['jd']
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+            'referer': 'https://union.jd.com/proManager/custompromotion',
             'content-type': 'application/json',
             'cookie': self.conn['admin_cookie'].find_one({'_id': ObjectId('5c5d7e772c56c16ebefbeff7')})['cookie']
         }
