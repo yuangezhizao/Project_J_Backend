@@ -68,8 +68,7 @@ class WX_User(db.Document):
     # 邀请码使用用户 uid，故不使用此法（invitation_code 还太长……
     '''
 
-    def generate_token(self):
-        expiration = 3600
+    def generate_token(self, expiration=3600):
         # 令牌过期时间暂定为一小时
         s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
         try:

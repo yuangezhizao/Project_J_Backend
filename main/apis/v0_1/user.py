@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 """
     :Author: yuangezhizao
+    :Co-authored-by: liyanzhe
     :Time: 2019/1/24 0024 19:39
     :Site: http://www.yuangezhizao.cn
+    :Copyright: © 2019 liyanzhe <liyanzhe@igengmei.com>
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
+import json
 from functools import wraps
 
+import requests
 from flask import g, current_app, request
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
@@ -189,3 +193,59 @@ def user_feedback():
     feedback.msg = msg
     feedback.save()
     return success('提交成功')
+
+
+@api_v0_1.route('/wx/login', methods=['POST'])
+def user_wx_login():
+    code = request.form.get('code')
+    if not code:
+        return bad_request(data='参数不完整')
+    access_params = {
+        'appid': current_app.config('WX_OPEN_APP_ID'),
+        'secret': current_app.config('WX_OPEN_APP_SECRET'),
+        'code': code,
+        'grant_type': 'authorization_code'
+    }
+    access_res = requests.get('https://api.weixin.qq.com/sns/oauth2/access_token', params=access_params)
+    access_res = json.loads(str(access_res.content))
+    if 'errcode' in access_res:
+        return bad_request(data='token校验失败')
+    access_token = access_res.get('access_token')
+    openid = access_res.get('openid')
+    # 获取微信登录信息
+    user_info_params = {
+        'access_token': access_token,
+        'openid': openid
+    }
+    user_res = requests.get('https://api.weixin.qq.com/sns/userinfo', params=user_info_params)
+    user_res = json.loads(str(user_res.content))
+    if 'errcode' in user_res:
+        return bad_request(data='登录失败')
+    user_info = {
+        'nickname': user_res.get('nickname', ''),
+        'sex': user_res.get('sex', 1),
+        'province': user_res.get('province', ''),
+        'city': user_res.get('city', ''),
+        'country': user_res.get('country', ''),
+        'headimgurl': user_res.get('headimgurl', ''),
+        'unionid': user_res.get('headimgurl', ''),
+    }
+    user = WX_User.objects(openid=openid).first()
+    if not user:
+        user = WX_User(openid=openid, userinfo=user_info)
+        user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
+        user.save()
+    user_info['user_id'] = user.uid
+    user_info.pop('unionid')
+    token = user.generate_token(expiration=3600 * 15)
+    res = success(data={'user': user_info, 'token': token})
+    res.headers['Access-Control-Allow-Origin'] = '*'
+    return res
+
+
+@api_v0_1.route('/wx/qr_img')
+def get_QR_img():
+    res = requests.get(
+        'https://open.weixin.qq.com/connect/qrconnect?appid={0}&redirect_uri=https%3A%2F%2Fymg2.sunlightdata.cn&response_type=code&scope=snsapi_login&state=STATE%23'.format(
+            current_app.config['WX_OPEN_APP_ID']))
+    return success(data={'result': str(res.content, encoding='utf8')})
