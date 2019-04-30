@@ -15,7 +15,7 @@ from main.apis.v0_1 import api_v0_1
 from main.blueprints.pc import pc_bp
 from main.blueprints.root import root_bp
 from main.blueprints.web import web_bp
-from main.plugins.extensions import db
+from main.plugins.extensions import db, es
 from main.settings import config
 
 
@@ -39,6 +39,7 @@ def register_extensions(app):
     sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
     sentry.init_app(app)
     db.init_app(app)
+    es.init_app(app)
 
 
 def register_blueprints(app):

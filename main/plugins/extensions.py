@@ -7,6 +7,8 @@
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
 
+from flask_elasticsearch import FlaskElasticsearch
 from flask_mongoengine import MongoEngine
 
 db = MongoEngine()
+es = FlaskElasticsearch()

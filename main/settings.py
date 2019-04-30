@@ -21,10 +21,7 @@ class BaseConfig:
         'password': os.getenv('MONGODB_SETTINGS_PASSWORD', None),
         'connect': False
     }
-    ES_SETTINGS = {
-        'host': os.getenv('ES_SETTINGS_HOST', None),
-        'port': 9200
-    }
+    ELASTICSEARCH_HOST = os.getenv('ELASTICSEARCH_HOST', None)
     APPID = os.getenv('APPID', None)
     APPSECRET = os.getenv('APPSECRET', None)
     FAKE_NUM = os.getenv('FAKE_NUM', None)

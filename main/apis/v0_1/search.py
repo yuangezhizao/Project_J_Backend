@@ -8,13 +8,11 @@
     :Copyright: © 2019 liyanzhe <liyanzhe@igengmei.com>
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
-from elasticsearch import Elasticsearch
-from flask import current_app, request
+from flask import request
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success
-
-es = Elasticsearch([current_app.config['ES_SETTINGS']])
+from main.plugins.extensions import es
 
 Update_time, Disperent, Quota = 1, 2, 3
 # 枚举类型 按照什么排序规则排序
