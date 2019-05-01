@@ -197,50 +197,48 @@ def user_feedback():
 
 @api_v0_1.route('/wx/login', methods=['POST'])
 def user_wx_login():
-    code = request.form.get('code')
-    if not code:
-        return bad_request(data='参数不完整')
+    try:
+        code = request.form['code']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
     access_params = {
         'appid': current_app.config['WX_OPEN_APP_ID'],
         'secret': current_app.config['WX_OPEN_APP_SECRET'],
         'code': code,
         'grant_type': 'authorization_code'
     }
-    access_res = requests.get('https://api.weixin.qq.com/sns/oauth2/access_token', params=access_params)
-    access_res = json.loads(str(access_res.content))
+    access_res = requests.get('https://api.weixin.qq.com/sns/oauth2/access_token', params=access_params).json()
+    print(access_res)
     if 'errcode' in access_res:
-        return bad_request(data='token校验失败')
+        return bad_request(data=access_res)
     access_token = access_res.get('access_token')
     openid = access_res.get('openid')
-    # 获取微信登录信息
     user_info_params = {
         'access_token': access_token,
         'openid': openid
     }
-    user_res = requests.get('https://api.weixin.qq.com/sns/userinfo', params=user_info_params)
-    user_res = json.loads(str(user_res.content))
-    if 'errcode' in user_res:
-        return bad_request(data='登录失败')
-    user_info = {
-        'nickname': user_res.get('nickname', ''),
-        'sex': user_res.get('sex', 1),
-        'province': user_res.get('province', ''),
-        'city': user_res.get('city', ''),
-        'country': user_res.get('country', ''),
-        'headimgurl': user_res.get('headimgurl', ''),
-        'unionid': user_res.get('headimgurl', ''),
-    }
-    user = WX_User.objects(openid=openid).first()
-    if not user:
-        user = WX_User(openid=openid, userinfo=user_info)
+    userinfo = requests.get('https://api.weixin.qq.com/sns/userinfo', params=user_info_params).json()
+    print(userinfo)
+    if 'errcode' in userinfo:
+        return bad_request(data=userinfo)
+    query = WX_User.objects(openid=openid)
+    if query:
+        query.update_one(set__access_token=access_token,
+                         # set__unionid=unionid,
+                         set__userinfo=eval(userinfo)
+                         )
+        user = query.first()
+    else:
+        user = WX_User()
         user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
+        user.openid = openid
+        user.access_token = access_token
+        # user.unionid = unionid
+        user.userinfo = eval(userinfo)
         user.save()
-    user_info['user_id'] = user.uid
-    user_info.pop('unionid')
-    token = user.generate_token(expiration=3600 * 15)
-    res = success(data={'user': user_info, 'token': token})
-    res.headers['Access-Control-Allow-Origin'] = '*'
-    return res
+    token = user.generate_token(7200)
+    return success({'user': userinfo, 'token': token})
 
 
 @api_v0_1.route('/wx/qr_img')
