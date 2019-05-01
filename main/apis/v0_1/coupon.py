@@ -6,6 +6,7 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
+import math
 from flask import request, g
 
 from main.apis.v0_1 import api_v0_1
@@ -158,9 +159,11 @@ def coupon_search():
             # 'key': item['_source'].get('key')
             # } if item.get('_source') else {}
         })
-    result = {  # 'total': r['hits']['total'],
-        'result': data}
-    return success(result)
+    pages = math.ceil(r['hits']['total'] / count)
+    next = page + 1 if page < pages else page
+    has_next = True if page < pages else False
+    r = {'result': data, 'next': next, 'pages': pages, 'has_next': has_next}
+    return success(r)
 
 
 @api_v0_1.route('/coupon/receive', methods=['GET', 'POST'])
