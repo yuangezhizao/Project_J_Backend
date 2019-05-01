@@ -105,15 +105,22 @@ def good_search():
     data = []
     for item in list(r['hits']['hits']):
         data.append({
-            '_id': item.get('_id'),
             # 'sort': item.get('sort'),
             # '_type': item.get('_type'),
             # '_source': {
             'sku': item['_source'].get('sku'),
-            'title': item['_source'].get('title'),
-            'img': item['_source'].get('img'),
-            'jd_price': item['_source'].get('jd_price'),
             'price_now': item['_source'].get('price_now'),
+            'img': item['_source'].get('img'),
+            'title': item['_source'].get('title').strip(),
+            'url': item['_source'].get('url'),
+            'discountpercent': ('%.2f' % (item['_source'].get('discountpercent'))),
+            'jd_price': item['_source'].get('jd_price'),
+            'buy_count': item['_source'].get('buy_count'),
+            'his_price': item['_source'].get('his_price'),
+            'cuxiao': item['_source'].get('cuxiao'),
+            'coupon_discount': item['_source'].get('coupon_discount'),
+            'coupon_quota': item['_source'].get('coupon_quota'),
+            'coupon_url': item['_source'].get('coupon_url')
         })
     pages = math.ceil(r['hits']['total'] / count)
     next = page + 1 if page < pages else page
