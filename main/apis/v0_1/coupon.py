@@ -171,13 +171,13 @@ def coupon_search():
 @api_v0_1.route('/coupon/receive', methods=['GET', 'POST'])
 def coupon_receive():
     try:
-        key = request.get_json()['key']
+        key = request.form['key']
     except Exception as e:
         print(e)
         return bad_request('参数错误')
     query = {
         'query': {
-            'match': {
+            'multi_match': {
                 'query': key,
                 'fields': ['_id']
             }
