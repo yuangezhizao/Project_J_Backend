@@ -19,5 +19,6 @@ itchat = "*"
 elasticsearch = "*"
 elasticsearch-dsl = "<6.0.0,>=5.0.0"
 flask-elasticsearch = "*"
+jinja2 = "*"
 
 [dev-packages]
