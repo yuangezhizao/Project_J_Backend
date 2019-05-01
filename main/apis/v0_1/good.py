@@ -6,6 +6,7 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
+import math
 from flask import request
 
 from main.apis.v0_1 import api_v0_1
@@ -113,6 +114,8 @@ def good_search():
             'jd_price': item['_source'].get('jd_price'),
             'price_now': item['_source'].get('price_now'),
         })
-    result = {  # 'total': r['hits']['hits']}
-        'result': data}
-    return success(result)
+    pages = math.ceil(r['hits']['total'] / count)
+    next = page + 1 if page < pages else page
+    has_next = True if page < pages else False
+    r = {'result': data, 'next': next, 'pages': pages, 'has_next': has_next}
+    return success(r)
