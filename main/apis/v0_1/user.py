@@ -201,8 +201,8 @@ def user_wx_login():
     if not code:
         return bad_request(data='参数不完整')
     access_params = {
-        'appid': current_app.config('WX_OPEN_APP_ID'),
-        'secret': current_app.config('WX_OPEN_APP_SECRET'),
+        'appid': current_app.config['WX_OPEN_APP_ID'],
+        'secret': current_app.config['WX_OPEN_APP_SECRET'],
         'code': code,
         'grant_type': 'authorization_code'
     }
