@@ -161,3 +161,24 @@ def coupon_search():
     result = {  # 'total': r['hits']['total'],
         'result': data}
     return success(result)
+
+
+@api_v0_1.route('/coupon/receive', methods=['GET', 'POST'])
+@auth_required
+def coupon_receive():
+    try:
+        key = request.get_json()['key']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    coupon = Coupon.objects(key=key).first()
+    if coupon is None:
+        return not_found('优惠券码无效')
+    r = {
+        'url': coupon.url,
+        'salesurl': coupon.salesurl,
+        'batchurl': coupon.batchurl,
+        'from_url': coupon.from_url,
+        'points': g.user.points,
+    }
+    return success(r)
