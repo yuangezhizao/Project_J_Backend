@@ -138,27 +138,28 @@ def coupon_search():
     r = es.search(index='jd', doc_type='coupon_detail', body=query)
     data = []
     for item in list(r['hits']['hits']):
-        data.append({
-            '_id': item.get('_id'),
-            # 'sort': item.get('sort'),
-            # '_type': item.get('_type'),
-            # '_source': {
-            'venderName': item['_source'].get('venderName'),  # 店名
-            # 'url': item['_source'].get('url'),
-            # 'update_time': item['_source'].get('update_time'),
-            # 'notes': item['_source'].get('notes'),
-            'batchCount': item['_source'].get('batchCount'),
-            # 'batchurl': item['_source'].get('batchurl'),
-            # 'from_url': item['_source'].get('from_url'),
-            'quota': item['_source'].get('quota'),
-            # 'salesurl': item['_source'].get('salesurl'),
-            # 'shopId': item['_source'].get('shopId'),
-            'discount': item['_source'].get('discount'),
-            'discountpercent': item['_source'].get('discountpercent'),  # x折
-            'limitStr': item['_source'].get('limitStr'),
-            # 'key': item['_source'].get('key')
-            # } if item.get('_source') else {}
-        })
+        if item['_source'].get('venderName'):
+            data.append({
+                '_id': item.get('_id'),
+                # 'sort': item.get('sort'),
+                # '_type': item.get('_type'),
+                # '_source': {
+                'venderName': item['_source'].get('venderName'),  # 店名
+                # 'url': item['_source'].get('url'),
+                # 'update_time': item['_source'].get('update_time'),
+                # 'notes': item['_source'].get('notes'),
+                'batchCount': item['_source'].get('batchCount'),
+                # 'batchurl': item['_source'].get('batchurl'),
+                # 'from_url': item['_source'].get('from_url'),
+                'quota': item['_source'].get('quota'),
+                # 'salesurl': item['_source'].get('salesurl'),
+                # 'shopId': item['_source'].get('shopId'),
+                'discount': item['_source'].get('discount'),
+                'discountpercent': item['_source'].get('discountpercent'),  # x折
+                'limitStr': item['_source'].get('limitStr'),
+                # 'key': item['_source'].get('key')
+                # } if item.get('_source') else {}
+            })
     pages = math.ceil(r['hits']['total'] / count)
     next = page + 1 if page < pages else page
     has_next = True if page < pages else False
