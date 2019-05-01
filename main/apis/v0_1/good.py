@@ -70,6 +70,7 @@ def good_search():
     # 枚举类型 按照什么排序规则排序
     count_allowed = [8, 28]
     page = int(request.args.get('page', 1))
+    page = page if page < 100 else 100
     s_content = request.args.get('content', '')
     s_type = int(request.args.get('type', 1))
     count = int(request.args.get('count', 28))
