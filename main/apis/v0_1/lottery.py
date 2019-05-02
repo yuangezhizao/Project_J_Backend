@@ -8,12 +8,14 @@
 """
 import datetime
 
+import math
 from flask import request, g
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
 from main.models.lottery import Lottery
+from main.plugins.extensions import es
 
 
 @api_v0_1.route('/lottery', methods=['GET', 'POST'])
@@ -110,16 +112,34 @@ def lottery_unlock():
     return success(r)
 
 
-@api_v0_1.route('/lottery/search', methods=['GET', 'POST'])
-@auth_required
+@api_v0_1.route('/lottery/search')
 def lottery_search():
-    # TODO：等学会 ES 的
-    try:
-        content = request.get_json()['content']
-    except Exception as e:
-        print(e)
-        return bad_request('参数错误')
-    r = {
-        'content': content,
+    count = int(request.args.get('count', 28)) if (int(request.args.get('count', 28)) in [8, 28]) else 28
+    page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
+    content = request.args.get('content', '')
+    query = {
+        'size': count,
+        'from': (page - 1) * count
     }
+    if content:
+        query['query'] = {
+            'multi_match': {
+                'query': content,
+                'fields': ['lotteryName']
+            }
+        }
+    query['sort'] = [{'endTime': 'desc'}]
+    result = es.search(index='jd', doc_type='lottery_detail', body=query)
+    data = []
+    for lottery in result['hits']['hits']:
+        new_lottery = {}
+        new_lottery['lotteryCode'] = lottery['_id']
+        new_lottery['lotteryName'] = lottery['_source'].get('lotteryName')
+        new_lottery['beginTime'] = lottery['_source'].get('beginTime')
+        new_lottery['endTime'] = lottery['_source'].get('endTime')
+        data.append(new_lottery)
+    pages = math.ceil(result['hits']['total'] / count)
+    next = page + 1 if page < pages else page
+    has_next = True if page < pages else False
+    r = {'lotteries': data, 'next': next, 'pages': pages, 'has_next': has_next}
     return success(r)
