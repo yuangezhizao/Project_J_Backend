@@ -227,7 +227,7 @@ def user_wx_login():
     if query:
         query.update_one(set__access_token=access_token,
                          # set__unionid=unionid,
-                         set__userinfo=eval(userinfo)
+                         set__userinfo=userinfo
                          )
         user = query.first()
     else:
