@@ -114,7 +114,7 @@ def lottery_unlock():
 
 @api_v0_1.route('/lottery/search')
 def lottery_search():
-    count = int(request.args.get('count', 28)) if (int(request.args.get('count', 28)) in [8, 28]) else 28
+    count = int(request.args.get('count', 15)) if (int(request.args.get('count', 15)) in [8, 15]) else 15
     page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
     content = request.args.get('content', '')
     query = {
