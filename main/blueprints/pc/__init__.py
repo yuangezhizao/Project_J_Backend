@@ -12,3 +12,5 @@ from flask_cors import CORS
 pc_bp = Blueprint('pc', __name__)
 
 CORS(pc_bp)
+
+from . import coupon

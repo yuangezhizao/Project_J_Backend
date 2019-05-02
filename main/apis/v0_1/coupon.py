@@ -166,31 +166,3 @@ def coupon_search():
     has_next = True if page < pages else False
     r = {'result': data, 'next': next, 'pages': pages, 'has_next': has_next}
     return success(r)
-
-
-@api_v0_1.route('/coupon/receive', methods=['GET', 'POST'])
-def coupon_receive():
-    try:
-        key = request.form['key']
-    except Exception as e:
-        print(e)
-        return bad_request('参数错误')
-    query = {
-        'query': {
-            'multi_match': {
-                'query': key,
-                'fields': ['_id']
-            }
-        }
-    }
-    r = es.search(index='jd', doc_type='coupon_detail', body=query)
-    if not len(r['hits']['hits']):
-        return not_found('优惠券码无效')
-    item = r['hits']['hits'][0]
-    result = {
-        'url': item['_source'].get('url'),
-        'salesurl': item['_source'].get('salesurl'),
-        'batchurl': item['_source'].get('batchurl'),
-        'from_url': item['_source'].get('from_url'),
-    }
-    return success(result)
