@@ -66,64 +66,48 @@ def good_detail():
 
 @api_v0_1.route('/good/search')
 def good_search():
-    Update_time, Disperent, Quota = 1, 2, 3
-    # 枚举类型 按照什么排序规则排序
-    count_allowed = [8, 28]
-    page = int(request.args.get('page', 1))
-    page = page if page < 100 else 100
-    s_content = request.args.get('content', '')
-    s_type = int(request.args.get('type', 1))
-    count = int(request.args.get('count', 28))
-    if count not in count_allowed:
-        count = 28
+    count = int(request.args.get('count', 28)) if (int(request.args.get('count', 28)) in [8, 28]) else 28
+    page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
+    content = request.args.get('content', '')
+    type = int(request.args.get('type', 1))
     query = {
-        'query': {
-            'multi_match': {
-                'query': s_content,
-                'fields': ['_id', 'title']
-                # 'fields': ['sku', 'title','jd_price','price_now']
-            }
-        },
         'size': count,
         'from': (page - 1) * count
     }
-    if not s_content:
-        query = {
-            'size': count,
-            'from': (page - 1) * count
+    if content:
+        query['query'] = {
+            'multi_match': {
+                'query': content,
+                'fields': ['_id', 'title']
+            }
         }
-    if Update_time == s_type:
-        sort = [{'update_time': 'desc'}]
-    elif Disperent == s_type:
-        sort = [{'discountpercent': 'asc'}]
-    # elif Quota == s_type:
-    #     sort = [{'quota': 'desc'}]
+    if type == 2:
+        query['sort'] = [{'discountpercent': 'asc'}]
     else:
-        sort = [{'update_time': 'desc'}]
-    query['sort'] = sort
-    r = es.search(index='jd', doc_type='projectj_goods', body=query)
+        query['sort'] = [{'update_time': 'desc'}]
+    result = es.search(index='jd', doc_type='projectj_goods', body=query)
     data = []
-    for item in list(r['hits']['hits']):
-        data.append({
-            # 'sort': item.get('sort'),
-            # '_type': item.get('_type'),
-            # '_source': {
-            'sku': item['_source'].get('sku'),
-            'price_now': item['_source'].get('price_now'),
-            'img': item['_source'].get('img'),
-            'title': item['_source'].get('title').strip(),
-            'url': item['_source'].get('url'),
-            'discountpercent': ('%.2f' % (item['_source'].get('discountpercent'))),
-            'jd_price': item['_source'].get('jd_price'),
-            'buy_count': item['_source'].get('buy_count'),
-            'his_price': item['_source'].get('his_price'),
-            'cuxiao': item['_source'].get('cuxiao'),
-            'coupon_discount': item['_source'].get('coupon_discount'),
-            'coupon_quota': item['_source'].get('coupon_quota'),
-            'coupon_url': item['_source'].get('coupon_url')
-        })
-    pages = math.ceil(r['hits']['total'] / count)
+    for good in result['hits']['hits']:
+        if good['_source'].get('title'):
+            new_good = {}
+            new_good['sku'] = good['_source'].get('sku')
+            new_good['price_now'] = good['_source'].get('price_now')
+            new_good['img'] = good['_source'].get('img')
+            new_good['title'] = good['_source'].get('title').strip()
+            new_good['batchCount'] = good['_source'].get('batchCount')
+            new_good['discountpercent'] = good['_source'].get('discountpercent')
+            new_good['url'] = good['_source'].get('url')
+            new_good['discountpercent'] = ('%.2f' % (good['_source'].get('discountpercent')))
+            new_good['jd_price'] = good['_source'].get('jd_price')
+            new_good['buy_count'] = good['_source'].get('buy_count')
+            new_good['his_price'] = good['_source'].get('his_price')
+            new_good['cuxiao'] = good['_source'].get('cuxiao')
+            new_good['coupon_discount'] = good['_source'].get('coupon_discount')
+            new_good['coupon_quota'] = good['_source'].get('coupon_quota')
+            new_good['coupon_url'] = good['_source'].get('coupon_url')
+            data.append(new_good)
+    pages = math.ceil(result['hits']['total'] / count)
     next = page + 1 if page < pages else page
     has_next = True if page < pages else False
-    r = {'result': data, 'next': next, 'pages': pages, 'has_next': has_next}
+    r = {'goods': data, 'next': next, 'pages': pages, 'has_next': has_next}
     return success(r)
