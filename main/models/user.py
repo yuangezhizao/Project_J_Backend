@@ -24,8 +24,10 @@ class WX_User(db.Document):
     }
     uid = db.IntField(required=True, unique=True)  # 自增 uid
     openid = db.StringField(unique=True)  # 用户唯一标识（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
-    # unionid  # 用户在开放平台的唯一标识符，在满足 UnionID 下发条件的情况下会返回，详见 UnionID 机制说明。（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
+    unionid = db.StringField(unique=True)  # 用户在开放平台的唯一标识符，在满足 UnionID 下发条件的情况下会返回
+    # 详见 UnionID 机制说明。（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
     session_key = db.StringField(default=None)  # 会话密钥（前端传入 wxcode，后端去微信服务器调用 code2Session 获得）
+    access_token = db.StringField(default=None)  # 微信网站应用登录
 
     userinfo = db.DictField(default=None)  # 用户信息对象，不包含 openid 等敏感信息（前端传入）
 
