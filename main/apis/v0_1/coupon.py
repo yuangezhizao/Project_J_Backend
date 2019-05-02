@@ -102,67 +102,52 @@ def coupon_unlock():
 
 @api_v0_1.route('/coupon/search')
 def coupon_search():
-    Update_time, Disperent, Quota = 1, 2, 3
-    # 枚举类型 按照什么排序规则排序
-    count_allowed = [8, 28]
-    page = int(request.args.get('page', 1))
-    page = page if page < 100 else 100
+    count = int(request.args.get('count', 28)) if (int(request.args.get('count', 28)) in [5, 8, 28]) else 28
+    page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
     content = request.args.get('content', '')
-    s_type = int(request.args.get('type', 1))
-    count = int(request.args.get('count', 28))
-    if count not in count_allowed:
-        count = 28
+    type = int(request.args.get('type', 1))
     query = {
-        'query': {
+        'size': count,
+        'from': (page - 1) * count
+    }
+    if content:
+        query['query'] = {
             'multi_match': {
                 'query': content,
                 'fields': ['limitStr', 'from_title', 'note', 'venderName']
             }
-        },
-        'size': count,
-        'from': (page - 1) * count
-    }
-    if not content:
-        query = {
-            'size': count,
-            'from': (page - 1) * count
         }
-    if Update_time == s_type:
-        sort = [{'update_time': 'desc'}]
-    elif Disperent == s_type:
-        sort = [{'discountpercent': 'asc'}]
-    elif Quota == s_type:
-        sort = [{'quota.keyword': 'desc'}]
+    if type == 2:
+        query['sort'] = [{'discountpercent': 'asc'}]
+    elif type == 3:
+        query['sort'] = [{'quota.keyword': 'desc'}]
     else:
-        sort = [{'update_time': 'desc'}]
-    query['sort'] = sort
-    r = es.search(index='jd', doc_type='coupon_detail', body=query)
+        query['sort'] = [{'update_time': 'desc'}]
+    result = es.search(index='jd', doc_type='coupon_detail', body=query)
     data = []
-    for item in list(r['hits']['hits']):
-        if item['_source'].get('venderName'):
-            data.append({
-                '_id': item.get('_id'),
-                # 'sort': item.get('sort'),
-                # '_type': item.get('_type'),
-                # '_source': {
-                'venderName': item['_source'].get('venderName'),  # 店名
-                # 'url': item['_source'].get('url'),
-                # 'update_time': item['_source'].get('update_time'),
-                # 'notes': item['_source'].get('notes'),
-                'batchCount': item['_source'].get('batchCount'),
-                # 'batchurl': item['_source'].get('batchurl'),
-                # 'from_url': item['_source'].get('from_url'),
-                'quota': item['_source'].get('quota'),
-                # 'salesurl': item['_source'].get('salesurl'),
-                # 'shopId': item['_source'].get('shopId'),
-                'discount': item['_source'].get('discount'),
-                'discountpercent': item['_source'].get('discountpercent'),  # x折
-                'limitStr': item['_source'].get('limitStr'),
-                # 'key': item['_source'].get('key')
-                # } if item.get('_source') else {}
-            })
-    pages = math.ceil(r['hits']['total'] / count)
+    for coupon in result['hits']['hits']:
+        if coupon['_source'].get('venderName'):
+            new_coupon = {}
+            new_coupon['key'] = coupon['_source'].get('key')
+            new_coupon['limitStr'] = coupon['_source'].get('limitStr')
+            new_coupon['coupon_name'] = '满 {0} 减 {1}'.format(coupon['_source'].get('quota'),
+                                                             coupon['_source'].get('discount'))
+            new_coupon['venderName'] = coupon['_source'].get('venderName')
+            new_coupon['batchCount'] = coupon['_source'].get('batchCount')
+            new_coupon['discountpercent'] = coupon['_source'].get('discountpercent')
+            # new_coupon['_id'] = coupon.get('_id')
+            # new_coupon['sort'] = coupon.get('sort')
+            # new_coupon['_type'] = coupon.get('_type')
+            # new_coupon['url'] = coupon['_source'].get('url')
+            # new_coupon['update_time'] = coupon['_source'].get('update_time')
+            # new_coupon['notes'] = coupon['_source'].get('notes')
+            # new_coupon['batchurl'] = coupon['_source'].get('batchurl')
+            # new_coupon['from_url'] = coupon['_source'].get('from_url')
+            # new_coupon['salesurl'] = coupon['_source'].get('salesurl')
+            # new_coupon['shopId'] = coupon['_source'].get('shopId')
+            data.append(new_coupon)
+    pages = math.ceil(result['hits']['total'] / count)
     next = page + 1 if page < pages else page
     has_next = True if page < pages else False
-    r = {'result': data, 'next': next, 'pages': pages, 'has_next': has_next}
+    r = {'coupons': data, 'next': next, 'pages': pages, 'has_next': has_next}
     return success(r)
