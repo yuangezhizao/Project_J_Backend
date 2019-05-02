@@ -135,8 +135,8 @@ def lottery_search():
         new_lottery = {}
         new_lottery['lotteryCode'] = lottery['_id']
         new_lottery['lotteryName'] = lottery['_source'].get('lotteryName')
-        new_lottery['beginTime'] = lottery['_source'].get('beginTime').strftime('%Y-%m-%d %H:%M:%S')
-        new_lottery['endTime'] = lottery['_source'].get('endTime').strftime('%Y-%m-%d %H:%M:%S')
+        new_lottery['beginTime'] = lottery['_source'].get('beginTime')  # .strftime('%Y-%m-%d %H:%M:%S')
+        new_lottery['endTime'] = lottery['_source'].get('endTime')  # .strftime('%Y-%m-%d %H:%M:%S')
         data.append(new_lottery)
     pages = math.ceil(result['hits']['total'] / count)
     next = page + 1 if page < pages else page
