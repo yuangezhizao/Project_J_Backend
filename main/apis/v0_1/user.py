@@ -226,16 +226,14 @@ def user_wx_login():
     query = WX_User.objects(openid=openid)
     if query:
         query.update_one(set__access_token=access_token,
-                         # set__unionid=unionid,
-                         set__userinfo=userinfo
-                         )
+                         set__userinfo=userinfo)
         user = query.first()
     else:
         user = WX_User()
         user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
         user.openid = openid
         user.access_token = access_token
-        # user.unionid = unionid
+        user.unionid = userinfo['unionid']
         user.userinfo = userinfo
         user.save()
     token = user.generate_token(7200)
