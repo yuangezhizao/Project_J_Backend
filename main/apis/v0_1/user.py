@@ -236,7 +236,7 @@ def user_wx_login():
         user.openid = openid
         user.access_token = access_token
         # user.unionid = unionid
-        user.userinfo = eval(userinfo)
+        user.userinfo = userinfo
         user.save()
     token = user.generate_token(7200)
     return success({'user': userinfo, 'token': token})
