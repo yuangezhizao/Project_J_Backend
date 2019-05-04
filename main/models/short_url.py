@@ -13,7 +13,6 @@ class Short_URL(db.Document):
     meta = {
         'collection': 'projectj_short_url'
     }
-    id = db.StringField(required=True, primary_key=True)
     jid = db.StringField(required=True)
     url = db.StringField(required=True)
     update_time = db.DateTimeField(required=True)
