@@ -13,4 +13,4 @@ pc_bp = Blueprint('pc', __name__)
 
 CORS(pc_bp)
 
-from . import coupon
+from . import coupon, user
