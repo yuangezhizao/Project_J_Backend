@@ -38,8 +38,12 @@ def short_url(jid):
     s = Short_URL.objects(jid=jid).first()
     if s is None:
         return not_found('键无效')
+    if 'union-click' in s.url:
+        return redirect(s.url)
     data = create_url(s.url)
     if data[0]:
+        s.url = data[1]
+        s.save()
         return redirect(data[1])
     else:
         return bad_request(data[1])
