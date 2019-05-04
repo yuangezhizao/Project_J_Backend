@@ -36,7 +36,7 @@ def create_url():
         if data[0]:
             s = Short_URL()
             sign_hash = hashlib.md5()
-            sign_hash.update(data[1].encode('utf-8'))
+            sign_hash.update(common_url.encode('utf-8'))
             s.jid = sign_hash.hexdigest()
             s.url = common_url
             s.create_url = data[1]
