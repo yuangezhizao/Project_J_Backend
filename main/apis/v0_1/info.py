@@ -8,7 +8,7 @@
 """
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success
-from main.models.info import WX_Info
+from main.models.info import WX_Info, PC_Info
 
 
 @api_v0_1.route('/info/points')
@@ -19,5 +19,17 @@ def info_points():
         new_info = {}
         new_info['title'] = info['title']
         new_info['content'] = info['content']
+        r.append(new_info)
+    return success(r)
+
+
+@api_v0_1.route('/pc/info')
+def pc_info():
+    infos = PC_Info.objects.all()
+    r = []
+    for info in infos:
+        new_info = {}
+        new_info['k'] = info['k']
+        new_info['v'] = info['v']
         r.append(new_info)
     return success(r)

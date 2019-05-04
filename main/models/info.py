@@ -18,3 +18,11 @@ class WX_Info(db.Document):
     title = db.StringField(required=True)  # 标题
     content = db.StringField(required=True)  # 内容
     insert_time = db.DateTimeField(default=datetime.datetime.utcnow())
+
+
+class PC_Info(db.Document):
+    meta = {
+        'collection': 'projectj_pc_infos'
+    }
+    k = db.StringField(required=True)
+    v = db.StringField(required=True)
