@@ -33,6 +33,7 @@ class BaseConfig:
     WX_OPEN_APP_SECRET = os.getenv('WX_OPEN_APP_SECRET', None)
     SALT = os.getenv('SALT', None)
 
+
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
 
