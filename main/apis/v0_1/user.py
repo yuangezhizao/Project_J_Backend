@@ -9,6 +9,7 @@
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
 import json
+import re
 from functools import wraps
 
 import requests
@@ -198,7 +199,7 @@ def user_feedback():
 @api_v0_1.route('/user/pc/login', methods=['GET', 'POST'])
 def user_pc_login():
     try:
-        code = request.form['code']
+        code = re.findall('{"code":"(.*?)"}', str(request.form))[0]
     except Exception as e:
         print(e)
         return bad_request('参数错误')
