@@ -34,7 +34,12 @@ def create_url():
 
 @root_bp.route('/s/<jid>')
 def short_url(jid):
+    from main.services.jd_union.open_api import create_url
     s = Short_URL.objects(jid=jid).first()
     if s is None:
         return not_found('键无效')
-    return redirect(s.url)
+    data = create_url(s.url)
+    if data[0]:
+        return redirect(data[1])
+    else:
+        return bad_request(data[1])
