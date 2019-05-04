@@ -41,6 +41,9 @@ def create_url(common_url):
     request_url += 'sign=' + str(sign).upper()
     res = requests.get(request_url)
     data = json.loads(str(res.content, encoding='utf-8'))
+    if 'errorResponse' in data:
+        print(data)
+        return [False, data['errorResponse']]
     data = json.loads(data['jd_union_open_promotion_common_get_response']['result'])
     if data['code'] == 200:
         return [True, data['data']['clickURL']]
