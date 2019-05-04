@@ -213,13 +213,14 @@ def user_wx_login():
     print(access_res)
     if 'errcode' in access_res:
         return bad_request(data=access_res)
-    access_token = access_res.get('access_token')
-    openid = access_res.get('openid')
+    access_token = access_res['access_token']
+    openid = access_res['openid']
     user_info_params = {
         'access_token': access_token,
         'openid': openid
     }
-    userinfo = requests.get('https://api.weixin.qq.com/sns/userinfo', params=user_info_params).json()
+    userinfo = requests.get('https://api.weixin.qq.com/sns/userinfo', params=user_info_params)
+    userinfo = json.loads(str(userinfo.content, encoding='utf-8'))
     print(userinfo)
     if 'errcode' in userinfo:
         return bad_request(data=userinfo)
@@ -233,11 +234,13 @@ def user_wx_login():
         user.uid = WX_User.objects.all().count() + 1 + current_app.config['FAKE_NUM']
         user.openid = openid
         user.access_token = access_token
-        user.unionid = userinfo['unionid']
         user.userinfo = userinfo
         user.save()
     token = user.generate_token(7200)
-    return success({'user': userinfo, 'token': token})
+    userinfo.pop('openid')
+    userinfo.pop('unionid')
+    userinfo['uid'] = user.uid
+    return success({'userinfo': userinfo, 'token': token})
 
 
 @api_v0_1.route('/wx/qr_img')
