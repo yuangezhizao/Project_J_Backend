@@ -15,4 +15,5 @@ class Short_URL(db.Document):
     }
     jid = db.StringField(required=True)
     url = db.StringField(required=True)
+    create_url = db.StringField(required=True)
     update_time = db.DateTimeField(required=True)
