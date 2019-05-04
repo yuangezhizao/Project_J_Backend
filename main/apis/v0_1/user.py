@@ -195,7 +195,7 @@ def user_feedback():
     return success('提交成功')
 
 
-@api_v0_1.route('/user/pc/login', methods=['POST'])
+@api_v0_1.route('/user/pc/login', methods=['GET', 'POST'])
 def user_pc_login():
     try:
         code = request.form['code']
