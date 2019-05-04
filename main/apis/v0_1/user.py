@@ -237,7 +237,7 @@ def user_pc_login():
         user.access_token = access_token
         user.userinfo = userinfo
         user.save()
-    token = user.generate_token(7200)
+    token = user.generate_token(3600 * 24 * 7)
     userinfo.pop('openid')
     userinfo.pop('unionid')
     userinfo['uid'] = user.uid
