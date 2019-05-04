@@ -13,6 +13,6 @@ api_v0_1 = Blueprint('api_v0_1', __name__)
 
 CORS(api_v0_1)
 
-from . import outputs, user, coupon, info, lottery, good, create_url
+from . import outputs, user, coupon, info, lottery, good
 
 # https://blog.csdn.net/hjxzb/article/details/78910832
