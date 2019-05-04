@@ -28,18 +28,23 @@ def create_url():
     common_url = request.args.get('common_url')
     if not common_url:
         return bad_request(data='参数不完整')
-    data = create_url(common_url)
-    if data[0]:
-        s = Short_URL()
-        sign_hash = hashlib.md5()
-        sign_hash.update(data[1].encode('utf-8'))
-        s.jid = sign_hash.hexdigest()
-        s.url = data[1]
-        s.update_time = datetime.datetime.utcnow()
-        s.save()
+    s = Short_URL.objects(url=common_url).first()
+    if s:
         return url_for('root.short_url', jid=s.jid, _external=True)
     else:
-        return bad_request(data[1])
+        data = create_url(common_url)
+        if data[0]:
+            s = Short_URL()
+            sign_hash = hashlib.md5()
+            sign_hash.update(data[1].encode('utf-8'))
+            s.jid = sign_hash.hexdigest()
+            s.url = common_url
+            s.create_url = data[1]
+            s.update_time = datetime.datetime.utcnow()
+            s.save()
+            return url_for('root.short_url', jid=s.jid, _external=True)
+        else:
+            return bad_request(data[1])
 
 
 @root_bp.route('/s/<jid>')
@@ -48,11 +53,11 @@ def short_url(jid):
     s = Short_URL.objects(jid=jid).first()
     if s is None:
         return not_found('键无效')
-    if 'union-click' in s.url:
-        return redirect(s.url)
+    if s.create_url:
+        return redirect(s.create_url)
     data = create_url(s.url)
     if data[0]:
-        s.url = data[1]
+        s.create_url = data[1]
         s.save()
         return redirect(data[1])
     else:
