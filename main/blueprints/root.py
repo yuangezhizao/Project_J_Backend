@@ -6,9 +6,12 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
-from flask import Blueprint, render_template, redirect, request
+import datetime
+import hashlib
 
-from main.apis.v0_1.outputs import not_found, bad_request, success
+from flask import Blueprint, render_template, redirect, request, url_for
+
+from main.apis.v0_1.outputs import not_found, bad_request
 from main.models.short_url import Short_URL
 
 root_bp = Blueprint('root', __name__)
@@ -27,7 +30,14 @@ def create_url():
         return bad_request(data='参数不完整')
     data = create_url(common_url)
     if data[0]:
-        return success(data[1])
+        s = Short_URL()
+        sign_hash = hashlib.md5()
+        sign_hash.update(data[1].encode('utf-8'))
+        s.jid = sign_hash.hexdigest()
+        s.url = data[1]
+        s.update_time = datetime.datetime.utcnow()
+        s.save()
+        return url_for('root.short_url', jid=s.jid, _external=True)
     else:
         return bad_request(data[1])
 
