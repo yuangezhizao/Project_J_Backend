@@ -6,14 +6,20 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
+
+import datetime
+import hashlib
+
 import math
-from flask import request, g
+from flask import request, g, url_for, current_app
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
 from main.models.coupon import Coupon
+from main.models.short_url import Short_URL
 from main.plugins.extensions import es
+from main.services.jd_union.open_api import create_url
 
 
 @api_v0_1.route('/coupon', methods=['GET', 'POST'])
@@ -151,3 +157,42 @@ def coupon_search():
     has_next = True if page < pages else False
     r = {'coupons': data, 'next': next, 'pages': pages, 'has_next': has_next}
     return success(r)
+
+
+@api_v0_1.route('/coupon/pc/unlock', methods=['GET', 'POST'])
+def coupon_pc_unlock():
+    try:
+        key = request.form['key']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    query = {
+        'query': {
+            'multi_match': {
+                'query': key,
+                'fields': ['_id']
+            }
+        }
+    }
+    r = es.search(index='jd', doc_type='coupon_detail', body=query)
+    if not len(r['hits']['hits']):
+        return not_found('优惠券码无效')
+    item = r['hits']['hits'][0]
+    from_url = item['_source']['from_url']
+    s = Short_URL.objects(url=from_url).first()
+    if s:
+        return success(url_for('root.short_url', jid=s.jid, _external=True))
+    else:
+        data = create_url(from_url)
+        if data[0]:
+            s = Short_URL()
+            sign_hash = hashlib.md5()
+            sign_hash.update((current_app.config['SALT'] + from_url).encode('utf-8'))
+            s.jid = sign_hash.hexdigest()
+            s.url = from_url
+            s.create_url = data[1]
+            s.update_time = datetime.datetime.utcnow()
+            s.save()
+            return success(url_for('root.short_url', jid=s.jid, _external=True))
+        else:
+            return bad_request(data[1])
