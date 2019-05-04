@@ -31,7 +31,7 @@ class BaseConfig:
     JD_UNION_SITE_ID = os.getenv('JD_UNION_SITE_ID', None)
     WX_OPEN_APP_ID = os.getenv('WX_OPEN_APP_ID', None)
     WX_OPEN_APP_SECRET = os.getenv('WX_OPEN_APP_SECRET', None)
-
+    SALT = os.getenv('SALT', None)
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True

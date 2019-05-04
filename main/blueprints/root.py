@@ -9,7 +9,7 @@
 import datetime
 import hashlib
 
-from flask import Blueprint, render_template, redirect, request, url_for
+from flask import Blueprint, render_template, redirect, request, url_for, current_app
 
 from main.apis.v0_1.outputs import not_found, bad_request
 from main.models.short_url import Short_URL
@@ -36,7 +36,7 @@ def create_url():
         if data[0]:
             s = Short_URL()
             sign_hash = hashlib.md5()
-            sign_hash.update(common_url.encode('utf-8'))
+            sign_hash.update((current_app.config['SALT'] + common_url).encode('utf-8'))
             s.jid = sign_hash.hexdigest()
             s.url = common_url
             s.create_url = data[1]
