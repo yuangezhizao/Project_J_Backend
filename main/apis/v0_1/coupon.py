@@ -160,6 +160,7 @@ def coupon_search():
 
 
 @api_v0_1.route('/coupon/pc/unlock', methods=['GET', 'POST'])
+@auth_required
 def coupon_pc_unlock():
     try:
         key = request.form['key']

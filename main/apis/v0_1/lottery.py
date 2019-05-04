@@ -149,6 +149,7 @@ def lottery_search():
 
 
 @api_v0_1.route('/lottery/pc/unlock', methods=['GET', 'POST'])
+@auth_required
 def lottery_pc_unlock():
     try:
         lotteryCode = request.form['lotteryCode']
