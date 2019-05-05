@@ -201,7 +201,7 @@ def user_feedback():
 @api_v0_1.route('/user/pc/login')
 def user_pc_login():
     try:
-        code = request.args['code']
+        code = request.args.get('code')
     except Exception as e:
         print(e)
         return bad_request('参数错误')
