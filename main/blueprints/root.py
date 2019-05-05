@@ -9,9 +9,11 @@
 import datetime
 import hashlib
 
-from flask import Blueprint, render_template, redirect, request, url_for, current_app
+from flask import Blueprint, render_template, redirect, url_for
+from flask import current_app, request
 
-from main.apis.v0_1.outputs import not_found, bad_request
+from main.apis.v0_1.outputs import bad_request
+from main.apis.v0_1.outputs import not_found
 from main.models.short_url import Short_URL
 
 root_bp = Blueprint('root', __name__)
