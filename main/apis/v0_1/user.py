@@ -250,3 +250,20 @@ def user_pc_login():
     res.set_cookie('headimgurl', str(userinfo['headimgurl']), max_age=7 * 24 * 3600)
     res.set_cookie('nickname', str(userinfo['nickname']), max_age=7 * 24 * 3600)
     return res
+
+
+@api_v0_1.route('/user/status')
+def user_status():
+    token = get_token()
+    # Flask normally handles OPTIONS requests on its own, but in the
+    # case it is configured to forward those to the application, we
+    # need to ignore authentication headers and let the request through
+    # to avoid unwanted interactions with CORS.
+    if request.method != 'OPTIONS':
+        if token is None:
+            return unauthorized('token_missing')
+        result = validate_token(token)
+        if result != True:
+            # 切记此处不可改成 if not result
+            return unauthorized(result)
+    return success(0)
