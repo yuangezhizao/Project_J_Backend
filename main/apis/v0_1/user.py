@@ -247,8 +247,6 @@ def user_pc_login():
 
     res = redirect(current_app.config['URL'])
     res.set_cookie('token', str(token['token']), max_age=7 * 24 * 3600)
-    res.set_cookie('headimgurl', str(userinfo['headimgurl']), max_age=7 * 24 * 3600)
-    res.set_cookie('nickname', str(userinfo['nickname']), max_age=7 * 24 * 3600)
     return res
 
 
