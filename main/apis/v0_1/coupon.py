@@ -11,10 +11,14 @@ import datetime
 import hashlib
 
 import math
-from flask import request, g, url_for, current_app
+from flask import current_app, request
+from flask import g
+from flask import url_for
 
 from main.apis.v0_1 import api_v0_1
-from main.apis.v0_1.outputs import success, bad_request, not_found
+from main.apis.v0_1.outputs import bad_request
+from main.apis.v0_1.outputs import not_found
+from main.apis.v0_1.outputs import success
 from main.apis.v0_1.user import auth_required
 from main.models.coupon import Coupon
 from main.models.short_url import Short_URL
@@ -118,9 +122,18 @@ def coupon_search():
     }
     if content:
         query['query'] = {
-            'multi_match': {
-                'query': content,
-                'fields': ['limitStr', 'from_title', 'note', 'venderName']
+            'bool': {
+                'must': {
+                    'multi_match': {
+                        'query': content,
+                        'fields': ['limitStr', 'from_title', 'note', 'venderName']
+                    }
+                },
+                'filter': {
+                    'exists': {
+                        'field': 'limitStr'
+                    }
+                }
             }
         }
     if type == 2:
@@ -132,26 +145,25 @@ def coupon_search():
     result = es.search(index='jd', doc_type='coupon_detail', body=query)
     data = []
     for coupon in result['hits']['hits']:
-        if coupon['_source'].get('venderName'):
-            new_coupon = {}
-            new_coupon['key'] = coupon['_source'].get('key')
-            new_coupon['limitStr'] = coupon['_source'].get('limitStr')
-            new_coupon['coupon_name'] = '满 {0} 减 {1}'.format(coupon['_source'].get('quota'),
-                                                             coupon['_source'].get('discount'))
-            new_coupon['venderName'] = coupon['_source'].get('venderName')
-            new_coupon['batchCount'] = coupon['_source'].get('batchCount')
-            new_coupon['discountpercent'] = coupon['_source'].get('discountpercent')
-            # new_coupon['_id'] = coupon.get('_id')
-            # new_coupon['sort'] = coupon.get('sort')
-            # new_coupon['_type'] = coupon.get('_type')
-            # new_coupon['url'] = coupon['_source'].get('url')
-            # new_coupon['update_time'] = coupon['_source'].get('update_time')
-            # new_coupon['notes'] = coupon['_source'].get('notes')
-            # new_coupon['batchurl'] = coupon['_source'].get('batchurl')
-            # new_coupon['from_url'] = coupon['_source'].get('from_url')
-            # new_coupon['salesurl'] = coupon['_source'].get('salesurl')
-            # new_coupon['shopId'] = coupon['_source'].get('shopId')
-            data.append(new_coupon)
+        new_coupon = {}
+        new_coupon['key'] = coupon['_source'].get('key')
+        new_coupon['limitStr'] = coupon['_source'].get('limitStr')
+        new_coupon['coupon_name'] = '满 {0} 减 {1}'.format(coupon['_source'].get('quota'),
+                                                         coupon['_source'].get('discount'))
+        new_coupon['venderName'] = coupon['_source'].get('venderName')
+        new_coupon['batchCount'] = coupon['_source'].get('batchCount')
+        new_coupon['discountpercent'] = coupon['_source'].get('discountpercent')
+        # new_coupon['_id'] = coupon.get('_id')
+        # new_coupon['sort'] = coupon.get('sort')
+        # new_coupon['_type'] = coupon.get('_type')
+        # new_coupon['url'] = coupon['_source'].get('url')
+        # new_coupon['update_time'] = coupon['_source'].get('update_time')
+        # new_coupon['notes'] = coupon['_source'].get('notes')
+        # new_coupon['batchurl'] = coupon['_source'].get('batchurl')
+        # new_coupon['from_url'] = coupon['_source'].get('from_url')
+        # new_coupon['salesurl'] = coupon['_source'].get('salesurl')
+        # new_coupon['shopId'] = coupon['_source'].get('shopId')
+        data.append(new_coupon)
     pages = math.ceil(result['hits']['total'] / count)
     next = page + 1 if page < pages else page
     has_next = True if page < pages else False
