@@ -9,15 +9,17 @@
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
 import json
-import re
 from functools import wraps
 
 import requests
-from flask import g, current_app, request
+from flask import current_app, request
+from flask import g
+from flask import redirect
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
 from main.apis.v0_1 import api_v0_1
-from main.apis.v0_1.outputs import unauthorized, success, bad_request
+from main.apis.v0_1.outputs import bad_request
+from main.apis.v0_1.outputs import unauthorized, success
 from main.models.feedback import WX_Feedback
 from main.models.user import WX_User
 
@@ -196,10 +198,10 @@ def user_feedback():
     return success('提交成功')
 
 
-@api_v0_1.route('/user/pc/login', methods=['GET', 'POST'])
+@api_v0_1.route('/user/pc/login')
 def user_pc_login():
     try:
-        code = re.findall('{"code":"(.*?)"}', str(request.form))[0]
+        code = request.args['code']
     except Exception as e:
         print(e)
         return bad_request('参数错误')
@@ -241,4 +243,10 @@ def user_pc_login():
     userinfo.pop('openid')
     userinfo.pop('unionid')
     userinfo['uid'] = user.uid
-    return success({'userinfo': userinfo, 'token': token})
+    # return success({'userinfo': userinfo, 'token': token})
+
+    res = redirect(current_app.config['URL'])
+    res.set_cookie('token', str(token['token']), max_age=7 * 24 * 3600)
+    res.set_cookie('headimgurl', str(userinfo['headimgurl']), max_age=7 * 24 * 3600)
+    res.set_cookie('nickname', str(userinfo['nickname']), max_age=7 * 24 * 3600)
+    return res
