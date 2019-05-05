@@ -267,3 +267,15 @@ def user_status():
             # 切记此处不可改成 if not result
             return unauthorized(result)
     return success(0)
+
+
+@api_v0_1.route('/user/pc/userinfo')
+@auth_required
+def user_pc_userinfo():
+    user = g.user
+    userinfo = user.userinfo
+    r = {
+        'nickname': userinfo['nickname'],
+        'headimgurl': userinfo['headimgurl'],
+    }
+    return success(r)
