@@ -111,3 +111,32 @@ def good_search():
     has_next = True if page < pages else False
     r = {'goods': data, 'next': next, 'pages': pages, 'has_next': has_next}
     return success(r)
+
+
+@api_v0_1.route('/good/pc/unlock', methods=['GET', 'POST'])
+@auth_required
+def good_pc_unlock():
+    try:
+        sku = request.form['sku']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    good = Good.objects(sku=sku).first()
+    if good is None:
+        return not_found('商品码无效')
+    r = {
+        'sku': good.sku,
+        'price_now': good.price_now,
+        'img': good.img,
+        'title': good.title.strip(),
+        'url': good.url,
+        'discountpercent': ('%.2f' % good.discountpercent),
+        'jd_price': good.jd_price,
+        'buy_count': good.buy_count,
+        'his_price': good.his_price,
+        'cuxiao': good.cuxiao,
+        'coupon_discount': good.coupon_discount,
+        'coupon_quota': good.coupon_quota,
+        'coupon_url': good.coupon_url
+    }
+    return success(r)
