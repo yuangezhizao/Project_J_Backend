@@ -16,6 +16,7 @@ from flask import request, url_for, current_app
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
+from main.models.coupon_limit import Coupon_Limit
 from main.models.good import Good
 from main.models.short_url import Short_URL
 from main.plugins.extensions import es
@@ -179,6 +180,28 @@ def good_pc_unlock():
             new_url = url_for('root.short_url', jid=s.jid, _external=True)
         else:
             return bad_request(data[1])
+    now_time = datetime.datetime.now()
+    coupons = Coupon_Limit.objects(endTime__gt=now_time, sku=sku).all()
+    r_n = []
+    for coupon in coupons:
+        query = {
+            'query': {
+                'multi_match': {
+                    'query': coupon.couponid,
+                    'fields': ['roleid']
+                }
+            }
+        }
+        r = es.search(index='jd', doc_type='coupon_detail', body=query)
+        if len(r['hits']['hits']):
+            item = r['hits']['hits'][0]
+            new_coupon = {}
+            new_coupon['limitStr'] = item['_source']['limitStr']
+            new_coupon['coupon_name'] = '满 {0} 减 {1}'.format(item['_source']['quota'], item['_source']['discount'])
+            new_coupon['batchCount'] = item['_source'].get('batchCount')
+            new_coupon['discountpercent'] = item['_source'].get('discountpercent')
+            new_coupon['salesurl'] = item['_source']['salesurl']
+            r_n.append(new_coupon)
     r = {
         'sku': good.sku,
         'price_now': good.price_now,
@@ -186,12 +209,11 @@ def good_pc_unlock():
         'title': good.title.strip(),
         'url': new_url,
         'discountpercent': ('%.2f' % good.discountpercent),
-        'jd_price': good.jd_price,
         'buy_count': good.buy_count,
-        'his_price': good.his_price,
         'cuxiao': good.cuxiao,
         'coupon_discount': good.coupon_discount,
         'coupon_quota': good.coupon_quota,
-        'coupon_url': good.coupon_url
+        'coupon_url': good.coupon_url,
+        'other_coupon': r_n
     }
     return success(r)
