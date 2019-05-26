@@ -135,27 +135,27 @@ def good_search():
             # new_good['batchCount'] = good['_source'].get('batchCount')
             new_good['discountpercent'] = ('%.1f' % good['_source'].get('discountpercent'))
 
-            new_good['url'] = good['_source'].get('url')
+            # new_good['url'] = good['_source'].get('url')
 
-            # url = good['_source'].get('url')
-            # s = Short_URL.objects(url=url).first()
-            # if s:
-            #     new_good['url'] = url_for('root.short_url', jid=s.jid, _external=True)
-            # else:
-            #     data = create_url(url)
-            #     if data[0]:
-            #         s = Short_URL()
-            #         sign_hash = hashlib.md5()
-            #         sign_hash.update((current_app.config['SALT'] + url).encode('utf-8'))
-            #         s.jid = sign_hash.hexdigest()
-            #         s.url = url
-            #         s.create_url = data[1]
-            #         s.update_time = datetime.datetime.utcnow()
-            #         s.save()
-            #         new_good['url'] = url_for('root.short_url', jid=s.jid, _external=True)
-            #     else:
-            #         new_good['url'] = url
-            #         # 容错
+            url = good['_source'].get('url')
+            s = Short_URL.objects(url=url).first()
+            if s:
+                new_good['url'] = url_for('root.short_url', jid=s.jid, _external=True)
+            else:
+                data = create_url(url)
+                if data[0]:
+                    s = Short_URL()
+                    sign_hash = hashlib.md5()
+                    sign_hash.update((current_app.config['SALT'] + url).encode('utf-8'))
+                    s.jid = sign_hash.hexdigest()
+                    s.url = url
+                    s.create_url = data[1]
+                    s.update_time = datetime.datetime.utcnow()
+                    s.save()
+                    new_good['url'] = url_for('root.short_url', jid=s.jid, _external=True)
+                else:
+                    new_good['url'] = url
+                    # 容错
 
             new_good['jd_price'] = good['_source'].get('jd_price')
             # new_good['buy_count'] = good['_source'].get('buy_count')
@@ -255,3 +255,34 @@ def good_pc_unlock():
         'other_coupon': r_n
     }
     return success(r)
+
+
+@api_v0_1.route('/good/pc/url', methods=['GET', 'POST'])
+@auth_required
+def good_pc_url():
+    try:
+        sku = request.form['sku']
+    except Exception as e:
+        print(e)
+        return bad_request('参数错误')
+    good = Good.objects(sku=sku).first()
+    if good is None:
+        return not_found('商品码无效')
+    url = good.url
+    s = Short_URL.objects(url=url).first()
+    if s:
+        return success(url_for('root.short_url', jid=s.jid, _external=True))
+    else:
+        data = create_url(url)
+        if data[0]:
+            s = Short_URL()
+            sign_hash = hashlib.md5()
+            sign_hash.update((current_app.config['SALT'] + url).encode('utf-8'))
+            s.jid = sign_hash.hexdigest()
+            s.url = url
+            s.create_url = data[1]
+            s.update_time = datetime.datetime.utcnow()
+            s.save()
+            return success(url_for('root.short_url', jid=s.jid, _external=True))
+        else:
+            return bad_request(data[1])
