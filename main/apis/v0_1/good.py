@@ -6,14 +6,20 @@
     :Site: http://www.yuangezhizao.cn
     :Copyright: © 2019 yuangezhizao <root@yuangezhizao.cn>
 """
+
+import datetime
+import hashlib
+
 import math
-from flask import request
+from flask import request, url_for, current_app
 
 from main.apis.v0_1 import api_v0_1
 from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
 from main.models.good import Good
+from main.models.short_url import Short_URL
 from main.plugins.extensions import es
+from main.services.jd_union.open_api import create_url
 
 
 @api_v0_1.route('/good', methods=['GET', 'POST'])
@@ -124,12 +130,30 @@ def good_pc_unlock():
     good = Good.objects(sku=sku).first()
     if good is None:
         return not_found('商品码无效')
+    url = good.url
+    s = Short_URL.objects(url=url).first()
+    if s:
+        new_url = url_for('root.short_url', jid=s.jid, _external=True)
+    else:
+        data = create_url(url)
+        if data[0]:
+            s = Short_URL()
+            sign_hash = hashlib.md5()
+            sign_hash.update((current_app.config['SALT'] + url).encode('utf-8'))
+            s.jid = sign_hash.hexdigest()
+            s.url = url
+            s.create_url = data[1]
+            s.update_time = datetime.datetime.utcnow()
+            s.save()
+            new_url = url_for('root.short_url', jid=s.jid, _external=True)
+        else:
+            return bad_request(data[1])
     r = {
         'sku': good.sku,
         'price_now': good.price_now,
         'img': good.img,
         'title': good.title.strip(),
-        'url': good.url,
+        'url': new_url,
         'discountpercent': ('%.2f' % good.discountpercent),
         'jd_price': good.jd_price,
         'buy_count': good.buy_count,
