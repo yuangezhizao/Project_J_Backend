@@ -258,7 +258,6 @@ def good_pc_unlock():
 
 
 @api_v0_1.route('/good/pc/url', methods=['GET', 'POST'])
-@auth_required
 def good_pc_url():
     try:
         sku = request.form['sku']
