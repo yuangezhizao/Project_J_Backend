@@ -139,8 +139,9 @@ def good_search():
             new_good['title'] = good['_source'].get('title').strip()
             # new_good['batchCount'] = good['_source'].get('batchCount')
             new_good['discountpercent'] = ('%.1f' % good['_source'].get('discountpercent'))
-
-            # new_good['url'] = good['_source'].get('url')
+            if float(new_good['discountpercent']) < 0:
+                new_good['discountpercent'] = 0
+                # new_good['url'] = good['_source'].get('url')
 
             # url = good['_source'].get('url')
             # s = Short_URL.objects(url=url).first()
