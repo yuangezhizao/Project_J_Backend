@@ -77,7 +77,7 @@ def good_search():
     page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
     content = request.args.get('content', '')
     sort = request.args.get('sort', '')
-    type = int(request.args.get('type', 1))
+    type = request.args.get('type', 0)
     query = {
         'size': count,
         'from': (page - 1) * count
@@ -119,10 +119,15 @@ def good_search():
                     }
                 }
             }
-    if type == 2:
+    if not type:
         query['sort'] = [{'discountpercent': 'asc'}]
     else:
-        query['sort'] = [{'update_time': 'desc'}]
+        if int(type) == 1:
+            query['sort'] = [{'update_time': 'asc'}]
+        elif int(type) == 0:
+            query['sort'] = [{'discountpercent': 'asc'}]
+        else:
+            query['sort'] = [{'discountpercent': 'asc'}]
     result = es.search(index='jd', doc_type='projectj_goods', body=query)
     data = []
     for good in result['hits']['hits']:
