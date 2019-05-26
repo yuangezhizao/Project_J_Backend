@@ -130,8 +130,40 @@ def coupon_search():
                     }
                 },
                 'filter': {
-                    'exists': {
-                        'field': 'limitStr'
+                    'bool': {
+                        'must': {
+                            'range': {
+                                'endTime': {
+                                    'gte': 'now'
+                                }
+                            }
+                        },
+                        'filter': {
+                            'exists': {
+                                'field': 'limitStr'
+                            }
+                        },
+                    }
+                }
+            }
+        }
+    else:
+        query['query'] = {
+            'bool': {
+                'filter': {
+                    'bool': {
+                        'must': {
+                            'range': {
+                                'endTime': {
+                                    'gte': 'now'
+                                }
+                            }
+                        },
+                        'filter': {
+                            'exists': {
+                                'field': 'limitStr'
+                            }
+                        }
                     }
                 }
             }
