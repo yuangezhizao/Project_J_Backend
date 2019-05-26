@@ -229,12 +229,11 @@ def good_pc_unlock():
             new_coupon['discountpercent'] = item['_source'].get('discountpercent')
             new_coupon['salesurl'] = item['_source']['salesurl']
             r_n.append(new_coupon)
-    batchCount, limitStr, coupon_name = '', '', ''
-    if good.coupon_key:
+    if good.coupon_roleid:
         query = {
             'query': {
                 'multi_match': {
-                    'query': good.coupon_key,
+                    'query': good.coupon_roleid,
                     'fields': ['roleid']
                 }
             }
@@ -257,9 +256,9 @@ def good_pc_unlock():
         'coupon_discount': good.coupon_discount,
         'coupon_quota': good.coupon_quota,
         'coupon_url': good.coupon_url,
-        'limitStr': limitStr,
-        'coupon_name': coupon_name,
-        'batchCount': batchCount,
+        'limitStr': limitStr if 'limitStr' in locals().keys() else '',
+        'coupon_name': coupon_name if 'coupon_name' in locals().keys() else '',
+        'batchCount': batchCount if 'batchCount' in locals().keys() else '',
         'other_coupon': r_n
     }
     return success(r)
