@@ -30,3 +30,5 @@ class Good(db.Document):
     coupon_roleid = db.StringField()
     coupon_url = db.StringField()  # 【优惠券链接 存在这个字段时 要有领取优惠券】
     coupon_key = db.StringField()
+
+    bigsort = db.StringField()
