@@ -133,9 +133,30 @@ def good_search():
             new_good['img'] = good['_source'].get('img')
             new_good['title'] = good['_source'].get('title').strip()
             # new_good['batchCount'] = good['_source'].get('batchCount')
-            new_good['discountpercent'] = good['_source'].get('discountpercent')
+            new_good['discountpercent'] = ('%.1f' % good['_source'].get('discountpercent'))
+
             new_good['url'] = good['_source'].get('url')
-            # new_good['discountpercent'] = ('%.2f' % (good['_source'].get('discountpercent')))
+
+            # url = good['_source'].get('url')
+            # s = Short_URL.objects(url=url).first()
+            # if s:
+            #     new_good['url'] = url_for('root.short_url', jid=s.jid, _external=True)
+            # else:
+            #     data = create_url(url)
+            #     if data[0]:
+            #         s = Short_URL()
+            #         sign_hash = hashlib.md5()
+            #         sign_hash.update((current_app.config['SALT'] + url).encode('utf-8'))
+            #         s.jid = sign_hash.hexdigest()
+            #         s.url = url
+            #         s.create_url = data[1]
+            #         s.update_time = datetime.datetime.utcnow()
+            #         s.save()
+            #         new_good['url'] = url_for('root.short_url', jid=s.jid, _external=True)
+            #     else:
+            #         new_good['url'] = url
+            #         # 容错
+
             new_good['jd_price'] = good['_source'].get('jd_price')
             # new_good['buy_count'] = good['_source'].get('buy_count')
             # new_good['his_price'] = good['_source'].get('his_price')
@@ -202,18 +223,35 @@ def good_pc_unlock():
             new_coupon['discountpercent'] = item['_source'].get('discountpercent')
             new_coupon['salesurl'] = item['_source']['salesurl']
             r_n.append(new_coupon)
+    batchCount, limitStr, coupon_name = '', '', ''
+    if good.coupon_url:
+        query = {
+            'query': {
+                'multi_match': {
+                    'query': good.coupon_key,
+                    'fields': ['roleid']
+                }
+            }
+        }
+        r = es.search(index='jd', doc_type='coupon_detail', body=query)
+        if len(r['hits']['hits']):
+            item = r['hits']['hits'][0]
+            limitStr = item['_source']['limitStr']
+            coupon_name = '满 {0} 减 {1}'.format(item['_source']['quota'], item['_source']['discount'])
+            batchCount = item['_source'].get('batchCount')
     r = {
-        'sku': good.sku,
         'price_now': good.price_now,
-        'img': good.img,
         'title': good.title.strip(),
         'url': new_url,
-        'discountpercent': ('%.2f' % good.discountpercent),
+        'discountpercent': ('%.1f' % good.discountpercent) if good.discountpercent != 10 else '',
         'buy_count': good.buy_count,
         'cuxiao': good.cuxiao,
         'coupon_discount': good.coupon_discount,
         'coupon_quota': good.coupon_quota,
         'coupon_url': good.coupon_url,
+        'limitStr': limitStr,
+        'coupon_name': coupon_name,
+        'batchCount': batchCount,
         'other_coupon': r_n
     }
     return success(r)
