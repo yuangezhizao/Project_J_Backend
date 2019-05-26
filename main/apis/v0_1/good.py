@@ -245,6 +245,8 @@ def good_pc_unlock():
             limitStr = item['_source']['limitStr']
             coupon_name = '满 {0} 减 {1}'.format(item['_source']['quota'], item['_source']['discount'])
             batchCount = item['_source'].get('batchCount')
+    if float(good.discountpercent) < 0:
+        good.discountpercent = 0
     r = {
         'price_now': good.price_now,
         'title': good.title.strip(),
