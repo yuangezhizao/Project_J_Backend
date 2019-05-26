@@ -126,9 +126,32 @@ def lottery_search():
     }
     if content:
         query['query'] = {
-            'multi_match': {
-                'query': content,
-                'fields': ['lotteryName']
+            'bool': {
+                'must': {
+                    'multi_match': {
+                        'query': content,
+                        'fields': ['lotteryName']
+                    }
+                },
+                'filter': {
+                    'bool': {
+                        'must': {
+                            'range': {
+                                'endTime': {
+                                    'gte': 'now'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    else:
+        query['query'] = {
+            'range': {
+                'endTime': {
+                    'gte': 'now'
+                }
             }
         }
     query['sort'] = [{'endTime': 'desc'}]
