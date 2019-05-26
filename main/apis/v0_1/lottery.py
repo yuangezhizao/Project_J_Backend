@@ -9,7 +9,6 @@
 import datetime
 import hashlib
 
-import math
 from flask import request, g, url_for, current_app
 
 from main.apis.v0_1 import api_v0_1
@@ -17,7 +16,6 @@ from main.apis.v0_1.outputs import success, bad_request, not_found
 from main.apis.v0_1.user import auth_required
 from main.models.lottery import Lottery
 from main.models.short_url import Short_URL
-from main.plugins.extensions import es
 from main.services.jd_union.open_api import create_url
 
 
@@ -115,60 +113,60 @@ def lottery_unlock():
     return success(r)
 
 
-@api_v0_1.route('/lottery/search')
-def lottery_search():
-    count = int(request.args.get('count', 15)) if (int(request.args.get('count', 15)) in [8, 15]) else 15
-    page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
-    content = request.args.get('content', '')
-    query = {
-        'size': count,
-        'from': (page - 1) * count
-    }
-    if content:
-        query['query'] = {
-            'bool': {
-                'must': {
-                    'multi_match': {
-                        'query': content,
-                        'fields': ['lotteryName']
-                    }
-                },
-                'filter': {
-                    'bool': {
-                        'must': {
-                            'range': {
-                                'endTime': {
-                                    'gte': 'now'
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    else:
-        query['query'] = {
-            'range': {
-                'endTime': {
-                    'gte': 'now'
-                }
-            }
-        }
-    query['sort'] = [{'endTime': 'desc'}]
-    result = es.search(index='jd', doc_type='lottery_detail', body=query)
-    data = []
-    for lottery in result['hits']['hits']:
-        new_lottery = {}
-        new_lottery['lotteryCode'] = lottery['_id']
-        new_lottery['lotteryName'] = lottery['_source'].get('lotteryName')
-        new_lottery['beginTime'] = lottery['_source'].get('beginTime')  # .strftime('%Y-%m-%d %H:%M:%S')
-        new_lottery['endTime'] = lottery['_source'].get('endTime')  # .strftime('%Y-%m-%d %H:%M:%S')
-        data.append(new_lottery)
-    pages = math.ceil(result['hits']['total'] / count)
-    next = page + 1 if page < pages else page
-    has_next = True if page < pages else False
-    r = {'lotteries': data, 'next': next, 'pages': pages, 'has_next': has_next}
-    return success(r)
+# @api_v0_1.route('/lottery/search')
+# def lottery_search():
+#     count = int(request.args.get('count', 15)) if (int(request.args.get('count', 15)) in [8, 15]) else 15
+#     page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
+#     content = request.args.get('content', '')
+#     query = {
+#         'size': count,
+#         'from': (page - 1) * count
+#     }
+#     if content:
+#         query['query'] = {
+#             'bool': {
+#                 'must': {
+#                     'multi_match': {
+#                         'query': content,
+#                         'fields': ['lotteryName']
+#                     }
+#                 },
+#                 'filter': {
+#                     'bool': {
+#                         'must': {
+#                             'range': {
+#                                 'endTime': {
+#                                     'gte': 'now'
+#                                 }
+#                             }
+#                         }
+#                     }
+#                 }
+#             }
+#         }
+#     else:
+#         query['query'] = {
+#             'range': {
+#                 'endTime': {
+#                     'gte': 'now'
+#                 }
+#             }
+#         }
+#     query['sort'] = [{'endTime': 'desc'}]
+#     result = es.search(index='jd', doc_type='lottery_detail', body=query)
+#     data = []
+#     for lottery in result['hits']['hits']:
+#         new_lottery = {}
+#         new_lottery['lotteryCode'] = lottery['_id']
+#         new_lottery['lotteryName'] = lottery['_source'].get('lotteryName')
+#         new_lottery['beginTime'] = lottery['_source'].get('beginTime')  # .strftime('%Y-%m-%d %H:%M:%S')
+#         new_lottery['endTime'] = lottery['_source'].get('endTime')  # .strftime('%Y-%m-%d %H:%M:%S')
+#         data.append(new_lottery)
+#     pages = math.ceil(result['hits']['total'] / count)
+#     next = page + 1 if page < pages else page
+#     has_next = True if page < pages else False
+#     r = {'lotteries': data, 'next': next, 'pages': pages, 'has_next': has_next}
+#     return success(r)
 
 
 @api_v0_1.route('/lottery/pc/unlock', methods=['GET', 'POST'])
