@@ -75,18 +75,49 @@ def good_search():
     count = int(request.args.get('count', 28)) if (int(request.args.get('count', 28)) in [8, 28]) else 28
     page = int(request.args.get('page', 1)) if (int(request.args.get('page', 1)) < 100) else 100
     content = request.args.get('content', '')
+    sort = request.args.get('sort', '')
     type = int(request.args.get('type', 1))
     query = {
         'size': count,
         'from': (page - 1) * count
     }
     if content:
-        query['query'] = {
-            'multi_match': {
-                'query': content,
-                'fields': ['_id', 'title']
+        if sort:
+            query['query'] = {
+                'bool': {
+                    'must': [
+                        {
+                            'multi_match': {
+                                'query': content,
+                                'fields': ['_id', 'title']
+                            }
+                        },
+                        {
+                            'match_phrase': {
+                                'bigsort': {
+                                    'query': sort
+                                }
+                            }
+                        }
+                    ]
+                }
             }
-        }
+        else:
+            query['query'] = {
+                'multi_match': {
+                    'query': content,
+                    'fields': ['_id', 'title']
+                }
+            }
+    else:
+        if sort:
+            query['query'] = {
+                'match_phrase': {
+                    'bigsort': {
+                        'query': sort
+                    }
+                }
+            }
     if type == 2:
         query['sort'] = [{'discountpercent': 'asc'}]
     else:
