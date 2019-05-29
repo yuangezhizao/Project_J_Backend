@@ -123,7 +123,7 @@ def good_search():
         query['sort'] = [{'discountpercent': 'asc'}]
     else:
         if int(type) == 1:
-            query['sort'] = [{'update_time': 'asc'}]
+            query['sort'] = [{'update_time': 'desc'}]
         elif int(type) == 0:
             query['sort'] = [{'discountpercent': 'asc'}]
         else:
@@ -166,7 +166,7 @@ def good_search():
             new_good['jd_price'] = good['_source'].get('jd_price')
             # new_good['buy_count'] = good['_source'].get('buy_count')
             # new_good['his_price'] = good['_source'].get('his_price')
-            # new_good['cuxiao'] = good['_source'].get('cuxiao')
+            new_good['cuxiao'] = good['_source'].get('cuxiao')
             # new_good['coupon_discount'] = good['_source'].get('coupon_discount')
             # new_good['coupon_quota'] = good['_source'].get('coupon_quota')
             # new_good['coupon_url'] = good['_source'].get('coupon_url')
